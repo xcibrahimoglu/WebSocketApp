@@ -1,4 +1,3 @@
-const client = new WebSocket("ws://localhost:8080/WebSocketApp/chat");
 client.onopen = function (event) {
         console.log("Connected");
     };
