@@ -2,11 +2,15 @@ package model;
 
 import java.util.Date;
 
-public class Message {
+@SuppressWarnings("rawtypes")
+public class Message extends WebSocketMessage{
 
+	public static final String type = "message";
     private String content;
     private String sender;
+    private String receiver;
     private Date receivedDate;
+  
     
 	public String getContent() {
 		return content;
@@ -25,5 +29,11 @@ public class Message {
 	}
 	public void setReceivedDate(Date receivedDate) {
 		this.receivedDate = receivedDate;
+	}
+	public String getReceiver() {
+		return receiver;
+	}
+	public void setReceiver(String receiver) {
+		this.receiver = receiver;
 	}
 }

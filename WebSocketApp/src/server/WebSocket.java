@@ -1,6 +1,8 @@
 package server;
 
-import java.util.Date;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
@@ -9,37 +11,41 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
-import com.google.gson.Gson;
-
+import model.MessageEncoder;
+import model.WebSocketMessage;
 import model.Message;
+import model.MessageDecoder;
 
-@ServerEndpoint("/chat")
+@ServerEndpoint(value = "/chat", encoders = MessageEncoder.class, decoders = MessageDecoder.class)
 public class WebSocket {
+	
+	//private static final Set<Session> sessions = new HashSet<Session>();
+	static Set<Session> peers = Collections.synchronizedSet(new HashSet<Session>());
+	static Set<String> usernames = Collections.synchronizedSet(new HashSet<String>());
     
     @OnOpen
     public void onOpen(Session session) {
         System.out.println("onOpen::" + session.getId());       
-        
+        peers.add(session);
     }
     @OnClose
     public void onClose(Session session) {
         System.out.println("onClose::" +  session.getId());
+        peers.remove(session);
     }
     
-    @OnMessage
-    public void handleTextMessage(Session session,String message) {
-    	Gson gson = new Gson();
-    	Message messageFromClient = gson.fromJson(message, Message.class);
-    	System.out.println(messageFromClient.getSender() + " : " + messageFromClient.getContent());
-    	System.out.println("Delivery time : " + new Date());
-    	Message messageFromServer = new Message();
-    	messageFromServer.setSender("Server");
-    	messageFromServer.setContent("What's up");
-    	messageFromServer.setReceivedDate(new Date());
+    //@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
+	@OnMessage
+    public void handleTextMessage(Session session,@SuppressWarnings("rawtypes") WebSocketMessage webSocketMessage) {
+    	for(Session peer : peers){
+    		if (webSocketMessage.getPayload() instanceof Message) {
+    			Message payload = (Message) webSocketMessage.getPayload();
+    			webSocketMessage.setPayload(payload);
+    		peer.getAsyncRemote().sendObject(webSocketMessage);
+    		}
+        }
     	
-
-    	String messageJson = gson.toJson(messageFromServer);
-    	session.getAsyncRemote().sendText(messageJson);
     }
      
     @OnMessage(maxMessageSize = 1024000)
