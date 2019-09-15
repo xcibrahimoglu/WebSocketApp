@@ -5,6 +5,20 @@ public class WebSocketMessage<T> {
 	
 	private String type;
 	private T payload;
+	
+	public WebSocketMessage() {
+		
+	}
+	
+	public WebSocketMessage(T payload) {
+		this.payload = payload;
+		if (payload instanceof Message) {
+		this.setType(Message.type);
+		}
+		else if(payload instanceof AllConnectedUsers) {
+		this.setType(AllConnectedUsers.type);
+		}
+	}
 
 	public String getType() {
 		return type;

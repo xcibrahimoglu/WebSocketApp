@@ -16,15 +16,15 @@ public class MessageDecoder implements Decoder.Text<WebSocketMessage> {
 	RuntimeTypeAdapterFactory<WebSocketMessage> runtimeTypeAdapterFactory = RuntimeTypeAdapterFactory
 		    .of(WebSocketMessage.class, "type")
 		    .registerSubtype(Message.class, "message")
-		    .registerSubtype(AllOnlineUsers.class, "allonlineusers");
+		    .registerSubtype(ConnectedUser.class, "connectedUser");
 	
 	Gson gson = new GsonBuilder().registerTypeAdapterFactory(runtimeTypeAdapterFactory).create();
 	Type type = new TypeToken<WebSocketMessage>(){}.getType();
 
     @Override
     public WebSocketMessage decode(final String Message) throws DecodeException {
-    	WebSocketMessage<?> webSocketMessage = new WebSocketMessage();
-    	webSocketMessage.setPayload(gson.fromJson(Message,type));        
+    	@SuppressWarnings("unchecked")
+		WebSocketMessage<?> webSocketMessage = new WebSocketMessage(gson.fromJson(Message,type));
         return webSocketMessage;
     }
 

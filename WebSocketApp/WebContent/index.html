@@ -229,23 +229,32 @@
         }
 
         socket = new WebSocket("ws://localhost:8080/WebSocketApp/chat");
-
+        
         socket.onopen = function (event) {
 			document.getElementById("authentication").style.display = "none";
             document.getElementById("contacts").style.display = "block";
             document.getElementById("chat").style.display = "block";
             document.getElementById("message").focus();
+            addConnectedUser(currentUser);
         };
-		
-		addAvailableUsers(currentUser);
+        
 
         socket.onmessage = function (event) {
 
             if (typeof event.data === "string") {
-
                 var webSocketMessage = JSON.parse(event.data);
                 var webSocketMessagePayload = webSocketMessage.payload;
-                displayMessage(webSocketMessagePayload.sender, webSocketMessagePayload.content);
+                switch(webSocketMessage.type) {
+                    case "message":
+                        displayMessage(webSocketMessagePayload.sender, webSocketMessagePayload.content);
+                        break;
+                    case "allConnectedUsers":
+                        cleanOnlineUsers(); 
+                        for (var i = 0; i < webSocketMessagePayload.usernames.length; i++) {
+                            onlineUsers(webSocketMessagePayload.usernames[i]);
+                        }
+                        break;    
+                }
             }
         };
     }
@@ -290,7 +299,16 @@
         messages.scrollTop = messages.scrollHeight;
     }
 
-    function addAvailableUsers(username) {
+    function addConnectedUser(currentUser){
+        var webSocketMessage = {
+            type:"connectedUser",
+            username:currentUser
+        };
+        socket.send(JSON.stringify(webSocketMessage));
+
+    }
+
+    function onlineUsers(username) {
 
         var contact = document.createElement("div");
         contact.setAttribute("class", "contact");
@@ -306,6 +324,13 @@
 
         var contacts = document.getElementById("contacts");
         contacts.appendChild(contact);
+    }
+
+    function cleanOnlineUsers() {
+        var contacts = document.getElementById("contacts");
+        while (contacts.hasChildNodes()) {
+            contacts.removeChild(contacts.lastChild);
+        }
     }
 
 </script>

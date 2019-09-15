@@ -10,7 +10,6 @@ public class Message extends WebSocketMessage{
     private String sender;
     private String receiver;
     private Date receivedDate;
-  
     
 	public String getContent() {
 		return content;

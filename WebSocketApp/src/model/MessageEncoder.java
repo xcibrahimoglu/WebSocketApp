@@ -13,7 +13,7 @@ public class MessageEncoder implements Encoder.Text<WebSocketMessage> {
 	Gson gson = new Gson();
 
     @Override
-    public String encode(@SuppressWarnings("rawtypes") final WebSocketMessage webSocketMessage) throws EncodeException {
+    public String encode(final WebSocketMessage webSocketMessage) throws EncodeException {
 		String messageJson = gson.toJson(webSocketMessage);
         return messageJson;
     }
