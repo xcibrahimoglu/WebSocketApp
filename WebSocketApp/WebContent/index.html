@@ -77,8 +77,19 @@
             width: 120px;
             padding: 20px;
             background-color: aliceblue;
-            min-height: calc(100vh - 85px);
-            max-height: calc(100vh - 85px);
+            min-height: calc(100vh - 125px);
+            max-height: calc(100vh - 125px);
+            display: none;
+        }
+
+        #contacts-title {
+            min-width: 160px;
+            max-width: 160px;
+            height: 40px;
+            font-size: 20px;
+            text-align: center;
+            color: #fff;
+            background-color: rgb(37, 189, 75);
             display: none;
         }
 
@@ -89,11 +100,19 @@
             border-radius: 50%;
             display: inline-block;
             margin-right: 10px;
+            margin-left: 10px;
         }
 
         #contacts .contact .name {
             line-height: 40px;
             vertical-align: super;
+            font-size: 15px;
+            font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+        }
+
+        #contacts .contact {
+            width: 140px;
+            margin-left: -10px;
         }
 
         /* Chat */
@@ -105,8 +124,8 @@
         }
 
         #messages {
-            min-height: calc(100vh - 130px);
-            max-height: calc(100vh - 130px);
+            min-height: calc(100vh - 170px);
+            max-height: calc(100vh - 170px);
             padding: 20px 20px 0 20px;
             overflow-y: auto;
         }
@@ -201,20 +220,19 @@
     <span class="error" id="authentication-error"></span>
 </form>
 
+<div id="contacts-title">Online Users</div>
+
 <div id="contacts"></div>
 
-<div id="chat">
-    <div id="messages"></div>
-    <form id="chat-controls" onsubmit="return false;">
-        <input type="text" id="message" placeholder="Enter a message"/>
-        <button class="button" onclick="sendMessage()">Send</button>
-    </form>
-</div>
+
+<div id="chat"></div>
 
 <script>
 
     var socket;
-    var currentUser ;
+    var currentUser;
+    var contactUser;
+    var allMessages = [];
 	
 	function signIn() {
 
@@ -232,9 +250,8 @@
         
         socket.onopen = function (event) {
 			document.getElementById("authentication").style.display = "none";
+            document.getElementById("contacts-title").style.display = "block";
             document.getElementById("contacts").style.display = "block";
-            document.getElementById("chat").style.display = "block";
-            document.getElementById("message").focus();
             addConnectedUser(currentUser);
         };
         
@@ -246,12 +263,17 @@
                 var webSocketMessagePayload = webSocketMessage.payload;
                 switch(webSocketMessage.type) {
                     case "message":
-                        displayMessage(webSocketMessagePayload.sender, webSocketMessagePayload.content);
+                        addMessageToAllMessages(webSocketMessagePayload.sender,webSocketMessagePayload.receiver, webSocketMessagePayload.content);
+                        if(webSocketMessagePayload.sender == currentUser || webSocketMessagePayload.sender == contactUser)
+                            displayMessage(webSocketMessagePayload.sender,webSocketMessagePayload.receiver);
                         break;
                     case "allConnectedUsers":
                         cleanOnlineUsers(); 
                         for (var i = 0; i < webSocketMessagePayload.usernames.length; i++) {
-                            onlineUsers(webSocketMessagePayload.usernames[i]);
+                            displayOnlineUsers(webSocketMessagePayload.usernames[i]);
+                        }
+                        if(webSocketMessagePayload.usernames.includes(contactUser) == false ){
+                            deleteConservationScreen();
                         }
                         break;    
                 }
@@ -266,36 +288,72 @@
 
 		var date = new Date();
 		var currentDate = date.getFullYear()+'-'+("0" + (date.getMonth() + 1)).slice(-2)+'-'+("0" + date.getDate()).slice(-2);
-		var webSocketMessage = {type:"message",content: text, sender : currentUser , receiver : "", receivedDate: currentDate };
+		var webSocketMessage = {
+            type:"message",
+            content: text, 
+            sender : currentUser ,
+            receiver : contactUser,
+            receivedDate: currentDate 
+            };
 
         socket.send(JSON.stringify(webSocketMessage));
     }
 
-    function displayMessage(username, text) {
+    function addMessageToAllMessages(sender,receiver, text) {
+        
+        var newMessage = {
+            sender : sender,
+            receiver : receiver,
+            content : text
+        };
 
-        var sentByCurrentUser = currentUser === username;
+        allMessages.push(newMessage);
 
-        var message = document.createElement("div");
-        message.setAttribute("class", sentByCurrentUser === true ? "message sent" : "message received");
-        message.dataset.sender = username;
+    }
 
-        var sender = document.createElement("span");
-        sender.setAttribute("class", "sender");
-        sender.appendChild(document.createTextNode(sentByCurrentUser === true ? "You" : username));
-        message.appendChild(sender);
+    function displayMessage(peerOne,peerTwo) {
 
-        var content = document.createElement("span");
-        content.setAttribute("class", "content");
-        content.appendChild(document.createTextNode(text));
-        message.appendChild(content);
+        var peer1 = peerOne;
+        var peer2 = peerTwo;
+        
+        deleteConservationScreen();
+        createConservationScreen();
 
-        var messages = document.getElementById("messages");
-        var lastMessage = messages.lastChild;
-        if (lastMessage && lastMessage.dataset.sender && lastMessage.dataset.sender === username) {
-            message.className += " same-sender-previous-message";
-        }
+        messages = document.getElementById("messages");
+        
+        allMessages.forEach(function(item) {
+            if((peer1 == item.sender && peer2 == item.receiver) || (peer2 == item.sender && peer1 == item.receiver)) {
 
-        messages.appendChild(message);
+                var sentByCurrentUser = currentUser === item.sender;
+
+                var message = document.createElement("div");
+                message.setAttribute("class", sentByCurrentUser === true ? "message sent" : "message received");
+                message.dataset.sender = item.sender;
+
+                var sender = document.createElement("span");
+                sender.setAttribute("class", "sender");
+                sender.appendChild(document.createTextNode(sentByCurrentUser === true ? "You" : item.sender));
+                message.appendChild(sender);
+
+                var content = document.createElement("span");
+                content.setAttribute("class", "content");
+                content.appendChild(document.createTextNode(item.content));
+                message.appendChild(content);
+
+                if(messages.hasChildNodes() == true) {
+                    var lastMessage = messages.lastChild;
+                }
+
+                if (lastMessage && lastMessage.dataset.sender && lastMessage.dataset.sender === item.sender) {
+                    message.className += " same-sender-previous-message";
+                }
+
+                messages.appendChild(message);
+
+            }
+                
+        });
+
         messages.scrollTop = messages.scrollHeight;
     }
 
@@ -308,22 +366,103 @@
 
     }
 
-    function onlineUsers(username) {
+    function displayOnlineUsers(username) {
+        
+        if(currentUser != username) {
+            var contact = document.createElement("div");
+            contact.setAttribute("class", "contact");
 
-        var contact = document.createElement("div");
-        contact.setAttribute("class", "contact");
+            var status = document.createElement("div");
+            status.setAttribute("class", "status");
+            contact.appendChild(status);
 
-        var status = document.createElement("div");
-        status.setAttribute("class", "status");
-        contact.appendChild(status);
-
-        var content = document.createElement("span");
-        content.setAttribute("class", "name");
-        content.appendChild(document.createTextNode(username));
-        contact.appendChild(content);
+            var content = document.createElement("span");
+            content.setAttribute("class", "name");
+            content.appendChild(document.createTextNode(username));
+            contact.appendChild(content);
+            contact.addEventListener("click",function() {
+                contactUser = username;
+                displayMessage(currentUser,contactUser);
+            })
 
         var contacts = document.getElementById("contacts");
         contacts.appendChild(contact);
+        }
+
+        addBackgroundColorToContact();
+
+    }
+
+    function addBackgroundColorToContact() {
+
+        var contacts = document.getElementsByClassName("contact");
+        
+        for(var i=0 ; i < contacts.length ; i++) {
+            if(contacts[i].innerText == contactUser) {
+                contacts[i].style.backgroundColor = "lightblue";
+                contacts[i].style.borderRadius = "10px";
+            }
+            else
+                contacts[i].style.backgroundColor = "";
+        }
+
+    }
+
+    function deleteConservationScreen() {
+
+        var messages = document.getElementById("messages");
+
+        if(document.body.contains(messages) == true) {
+            var allMessagesOnTheScreen = document.getElementById("messages");
+            while (allMessagesOnTheScreen.hasChildNodes() == true) {
+                allMessagesOnTheScreen.removeChild(allMessagesOnTheScreen.firstChild);
+            }
+        }
+
+    }
+
+    function createConservationScreen() {
+
+        addBackgroundColorToContact();
+
+        var chat = document.getElementById("chat");
+        var messages = document.getElementById("messages");
+        
+
+        if(document.body.contains(messages) == true) {
+            while (chat.hasChildNodes() == true) {
+                chat.removeChild(chat.firstChild);
+            }
+        }
+
+
+        var messages = document.createElement("div");
+        messages.setAttribute("id","messages");
+
+        chat.append(messages);
+
+        var chatControls = document.createElement("form");
+        chatControls.setAttribute("id","chat-controls");
+        chatControls.setAttribute("onsubmit","return false;");
+
+        var text = document.createElement("input");
+        text.setAttribute("type","text");
+        text.setAttribute("id","message");
+        text.setAttribute("placeholder","Enter a message");
+
+        var button = document.createElement("button");
+        button.setAttribute("class","button");
+        button.setAttribute("onclick","sendMessage()");
+        button.innerHTML = "Send";
+
+        chatControls.appendChild(text);
+        chatControls.appendChild(button);
+
+        chat.appendChild(chatControls);
+
+        document.getElementById("chat").style.display = "block";
+        document.getElementById("message").focus();
+
     }
 
     function cleanOnlineUsers() {
