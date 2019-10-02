@@ -31,20 +31,20 @@
         button {
             border-radius: 20px;
             padding: 10px;
-            background-color: #0084FF;
+            background-color: rgb(121, 179, 233);
             color: #fff;
             width: 6em;
-            border: 2px solid #0084FF;
+            border: 2px solid rgb(121, 179, 233);
         }
 
         button:hover,
         button:focus {
-            background-color: #0966ff;
-            border-color: #0966ff;
+            background-color: rgb(121, 179, 233);
+            border-color: rgb(121, 179, 233);
             cursor: pointer;
         }
 		
-		        /* Authentication */
+		/* Authentication */
 
         #authentication {
             margin-top: 100px;
@@ -64,8 +64,10 @@
         /* Title Bar */
 
         #title {
-            background-color: #0084FF;
+            background-color: rgb(121, 179, 233);
             font-size: 20px;
+            font-weight: bold;
+            text-align: center;
             padding: 10px 20px 10px 20px;
             color: #fff;
         }
@@ -74,45 +76,39 @@
 
         #contacts {
             float: left;
-            width: 120px;
-            padding: 20px;
+            width: 160px;
             background-color: aliceblue;
-            min-height: calc(100vh - 125px);
-            max-height: calc(100vh - 125px);
+            min-height: calc(100vh - 45px);
+            max-height: calc(100vh - 45px);
             display: none;
         }
 
-        #contacts-title {
-            min-width: 160px;
-            max-width: 160px;
+        #contacts .contacts-title {
+            margin-bottom: 10px;
+            padding-top: 10px;
             height: 40px;
             font-size: 20px;
+            font-weight: bold;
             text-align: center;
             color: #fff;
-            background-color: rgb(37, 189, 75);
-            display: none;
+            background-color: rgb(154, 212, 231);
         }
-
-        #contacts .contact .status {
-            background-color: #13CF13;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 10px;
+        
+        #contacts .contact {
+            background-color: rgb(121, 179, 233);
+            text-align: center;
+            width: 140px;
+            border-radius: 10px;
             margin-left: 10px;
+            margin-bottom: 10px;
         }
 
         #contacts .contact .name {
             line-height: 40px;
             vertical-align: super;
             font-size: 15px;
-            font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-        }
-
-        #contacts .contact {
-            width: 140px;
-            margin-left: -10px;
+            color: #fff;
+            padding : 5px;
         }
 
         /* Chat */
@@ -120,12 +116,14 @@
         #chat {
             float: right;
             width: calc(100% - 160px);
+            height: calc(100% - 40px);
             display: none;
+            text-align: center;
         }
 
         #messages {
-            min-height: calc(100vh - 170px);
-            max-height: calc(100vh - 170px);
+            min-height: calc(100vh - 130px);
+            max-height: calc(100vh - 130px);
             padding: 20px 20px 0 20px;
             overflow-y: auto;
         }
@@ -140,6 +138,18 @@
             border-radius: 20px;
             padding: 10px;
             display: table;
+            margin-bottom: 5px;
+        }
+
+        #messages .message .time{
+            background-color: aliceblue;
+            color: rgba(10, 134, 143, 0.932);
+            padding-left: 5px;
+            padding-right: 5px;
+            height: 20px;
+            border-radius: 5px;
+            font-size: 10px; 
+            opacity: 0.5;
         }
 
         #messages .message.event .content {
@@ -157,12 +167,13 @@
         }
 
         #messages .message.received .content {
-            background-color: gainsboro;
+            background-color: rgb(121, 179, 233);
+            color: aliceblue;
             border-radius: 0 20px 20px;
         }
 
         #messages .message.received .sender {
-            color: dimgrey;
+            color: aliceblue;
             font-size: 10px;
         }
 
@@ -172,17 +183,12 @@
         }
 
         #messages .message.sent .content {
-            background-color: #0084FF;
+            background-color: rgb(121, 179, 233);
             margin-left: auto;
             margin-right: 0;
-            color: #fff;
+            color: aliceblue;
             text-align: right;
             border-radius: 20px 0 20px 20px;
-        }
-
-        #messages .message.sent .sender {
-            color: #0084FF;
-            font-size: 10px;
         }
 
         #chat-controls {
@@ -212,7 +218,7 @@
 </head>
 <body>
 
-<div id="title">Chat</div>
+<div id="title">Hey Buddy!</div>
 
 <form id="authentication" onsubmit="return false;">
     <input type="text" id="username" placeholder="Username" autofocus/>
@@ -220,10 +226,7 @@
     <span class="error" id="authentication-error"></span>
 </form>
 
-<div id="contacts-title">Online Users</div>
-
 <div id="contacts"></div>
-
 
 <div id="chat"></div>
 
@@ -250,7 +253,6 @@
         
         socket.onopen = function (event) {
 			document.getElementById("authentication").style.display = "none";
-            document.getElementById("contacts-title").style.display = "block";
             document.getElementById("contacts").style.display = "block";
             addConnectedUser(currentUser);
         };
@@ -263,9 +265,9 @@
                 var webSocketMessagePayload = webSocketMessage.payload;
                 switch(webSocketMessage.type) {
                     case "message":
-                        addMessageToAllMessages(webSocketMessagePayload.sender,webSocketMessagePayload.receiver, webSocketMessagePayload.content);
+                        addMessageToAllMessages(webSocketMessagePayload.sender,webSocketMessagePayload.receiver, webSocketMessagePayload.content,webSocketMessagePayload.receivedDate);
                         if(webSocketMessagePayload.sender == currentUser || webSocketMessagePayload.sender == contactUser)
-                            displayMessage(webSocketMessagePayload.sender,webSocketMessagePayload.receiver);
+                            displayMessage(webSocketMessagePayload.sender,webSocketMessagePayload.receiver,webSocketMessagePayload.receivedDate);
                         break;
                     case "allConnectedUsers":
                         cleanOnlineUsers(); 
@@ -295,26 +297,30 @@
             receiver : contactUser,
             receivedDate: currentDate 
             };
-
-        socket.send(JSON.stringify(webSocketMessage));
+        if(text != ""){
+            socket.send(JSON.stringify(webSocketMessage));
+        }
     }
 
-    function addMessageToAllMessages(sender,receiver, text) {
+    function addMessageToAllMessages(sender,receiver, text, deliveryDate) {
         
+        var date = new Date();
+        var currentTime = ("0"+date.getHours()).slice(-2) + ":" + ("0"+date.getMinutes()).slice(-2) + ":" + ("0"+date.getSeconds()).slice(-2);
+
         var newMessage = {
             sender : sender,
             receiver : receiver,
-            content : text
+            content : text,
+            receivedDate : deliveryDate,
+            receivedTime : currentTime
         };
 
         allMessages.push(newMessage);
 
     }
 
-    function displayMessage(peerOne,peerTwo) {
+    function displayMessage(peerOne,peerTwo,receivedDate) {
 
-        var peer1 = peerOne;
-        var peer2 = peerTwo;
         
         deleteConservationScreen();
         createConservationScreen();
@@ -322,23 +328,22 @@
         messages = document.getElementById("messages");
         
         allMessages.forEach(function(item) {
-            if((peer1 == item.sender && peer2 == item.receiver) || (peer2 == item.sender && peer1 == item.receiver)) {
+            if((peerOne == item.sender && peerTwo == item.receiver) || (peerTwo == item.sender && peerOne == item.receiver)) {
 
                 var sentByCurrentUser = currentUser === item.sender;
 
                 var message = document.createElement("div");
                 message.setAttribute("class", sentByCurrentUser === true ? "message sent" : "message received");
-                message.dataset.sender = item.sender;
-
-                var sender = document.createElement("span");
-                sender.setAttribute("class", "sender");
-                sender.appendChild(document.createTextNode(sentByCurrentUser === true ? "You" : item.sender));
-                message.appendChild(sender);
 
                 var content = document.createElement("span");
                 content.setAttribute("class", "content");
                 content.appendChild(document.createTextNode(item.content));
                 message.appendChild(content);
+
+                var time = document.createElement("span");
+                time.setAttribute("class", "time");
+                time.appendChild(document.createTextNode(item.receivedTime));
+                message.appendChild(time);
 
                 if(messages.hasChildNodes() == true) {
                     var lastMessage = messages.lastChild;
@@ -368,13 +373,11 @@
 
     function displayOnlineUsers(username) {
         
+        var contacts = document.getElementById("contacts");
+
         if(currentUser != username) {
             var contact = document.createElement("div");
             contact.setAttribute("class", "contact");
-
-            var status = document.createElement("div");
-            status.setAttribute("class", "status");
-            contact.appendChild(status);
 
             var content = document.createElement("span");
             content.setAttribute("class", "name");
@@ -385,7 +388,6 @@
                 displayMessage(currentUser,contactUser);
             })
 
-        var contacts = document.getElementById("contacts");
         contacts.appendChild(contact);
         }
 
@@ -396,14 +398,17 @@
     function addBackgroundColorToContact() {
 
         var contacts = document.getElementsByClassName("contact");
+
+        
         
         for(var i=0 ; i < contacts.length ; i++) {
             if(contacts[i].innerText == contactUser) {
-                contacts[i].style.backgroundColor = "lightblue";
+                contacts[i].style.backgroundColor = "rgb(168, 218, 235)";
                 contacts[i].style.borderRadius = "10px";
             }
-            else
+            else {
                 contacts[i].style.backgroundColor = "";
+            }
         }
 
     }
@@ -470,6 +475,10 @@
         while (contacts.hasChildNodes()) {
             contacts.removeChild(contacts.lastChild);
         }
+        var contactsTitle = document.createElement("div");
+        contactsTitle.setAttribute("class","contacts-title");
+        contactsTitle.innerHTML = "Chats";
+        contacts.appendChild(contactsTitle);
     }
 
 </script>
