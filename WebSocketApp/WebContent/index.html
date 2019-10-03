@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <title>Chat</title>
     <meta name="description" content="Chat application">
 
     <style>
-
         /* Common */
 
         * {
@@ -22,13 +22,13 @@
             font-size: 12px;
         }
 
-        input[type="text"]{
+        input[type="text"] {
             border-radius: 20px;
             padding: 10px;
             border: 2px solid gainsboro;
         }
 
-        button {
+        .button {
             border-radius: 20px;
             padding: 10px;
             background-color: rgb(121, 179, 233);
@@ -37,14 +37,14 @@
             border: 2px solid rgb(121, 179, 233);
         }
 
-        button:hover,
-        button:focus {
+        .button:hover,
+        .button:focus {
             background-color: rgb(121, 179, 233);
             border-color: rgb(121, 179, 233);
             cursor: pointer;
         }
-		
-		/* Authentication */
+
+        /* Authentication */
 
         #authentication {
             margin-top: 100px;
@@ -72,6 +72,32 @@
             color: #fff;
         }
 
+        .currentUserToTitle {
+            float: right;
+            font-size: 20px;
+            font-weight: normal;
+            padding-left: 5px;
+            padding-right: 5px;
+            border-radius: 10px;
+            border: 2px solid #fff;
+            background-color: rgb(69, 144, 214);
+        }
+
+        .signOut {
+            float: right;
+            background-color: rgb(214, 86, 69);
+            border-radius: 10px;
+            padding: 5px;
+            margin-left: 5px;
+            color: #fff;
+        }
+
+        .signOut:focus,
+        .signOut:hover {
+            background-color: rgb(121, 179, 233);
+            cursor: pointer;
+        }
+
         /* Contact list */
 
         #contacts {
@@ -93,7 +119,7 @@
             color: #fff;
             background-color: rgb(154, 212, 231);
         }
-        
+
         #contacts .contact {
             background-color: rgb(121, 179, 233);
             text-align: center;
@@ -103,12 +129,28 @@
             margin-bottom: 10px;
         }
 
+        #contacts .contact .unread {
+            background-color: rgb(168, 218, 235);
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: -15px;
+            margin-bottom: 2px;
+        }
+
+        .contact:focus,
+        .contact:hover {
+            background-color: rgb(168, 218, 235);
+            cursor: pointer;
+        }
+
         #contacts .contact .name {
             line-height: 40px;
             vertical-align: super;
             font-size: 15px;
             color: #fff;
-            padding : 5px;
+            padding: 5px;
         }
 
         /* Chat */
@@ -136,19 +178,19 @@
             min-width: 20px;
             max-width: 250px;
             border-radius: 20px;
-            padding: 10px;
+            padding: 5px 10px 5px 10px;
             display: table;
             margin-bottom: 5px;
         }
 
-        #messages .message .time{
+        #messages .message .time {
             background-color: aliceblue;
             color: rgba(10, 134, 143, 0.932);
             padding-left: 5px;
             padding-right: 5px;
             height: 20px;
             border-radius: 5px;
-            font-size: 10px; 
+            font-size: 10px;
             opacity: 0.5;
         }
 
@@ -212,276 +254,355 @@
         #messages .message:not(.same-sender-previous-message) {
             margin-top: 10px;
         }
-
     </style>
 
 </head>
+
 <body>
 
-<div id="title">Hey Buddy!</div>
+    <div id="title">Hey Buddy!</div>
 
-<form id="authentication" onsubmit="return false;">
-    <input type="text" id="username" placeholder="Username" autofocus/>
-    <button class="button" onclick="signIn()">Sign In</button>
-    <span class="error" id="authentication-error"></span>
-</form>
+    <form id="authentication" onsubmit="return false;">
+        <input type="text" id="username" placeholder="Username" autofocus />
+        <button class="button" onclick="signIn()">Sign In</button>
+        <span class="error" id="authentication-error"></span>
+    </form>
 
-<div id="contacts"></div>
+    <div id="contacts"></div>
 
-<div id="chat"></div>
+    <div id="chat"></div>
 
-<script>
+    <script>
 
-    var socket;
-    var currentUser;
-    var contactUser;
-    var allMessages = [];
-	
-	function signIn() {
+        var socket;
+        var currentUser;
+        var contactUser;
+        var allMessages = [];
 
-		currentUser = document.getElementById("username").value;
-		openSocket();
-	}
+        function signIn() {
 
-    function openSocket() {
+            currentUser = document.getElementById("username").value;
+            openSocket();
+        }
 
-        if (socket) {
+        function signOut() {
+            document.getElementById("authentication").style.display = "block";
+            document.getElementById("contacts").style.display = "none";
+
+            var title = document.getElementById("title");
+            title.removeChild(title.lastChild);
+            title.removeChild(title.lastChild);
+
+            var chat = document.getElementById("chat");
+            while (chat.hasChildNodes()) {
+                chat.removeChild(chat.lastChild);
+            }
+
             socket.close();
         }
 
-        socket = new WebSocket("ws://localhost:8080/WebSocketApp/chat");
-        
-        socket.onopen = function (event) {
-			document.getElementById("authentication").style.display = "none";
-            document.getElementById("contacts").style.display = "block";
-            addConnectedUser(currentUser);
-        };
-        
+        function openSocket() {
 
-        socket.onmessage = function (event) {
-
-            if (typeof event.data === "string") {
-                var webSocketMessage = JSON.parse(event.data);
-                var webSocketMessagePayload = webSocketMessage.payload;
-                switch(webSocketMessage.type) {
-                    case "message":
-                        addMessageToAllMessages(webSocketMessagePayload.sender,webSocketMessagePayload.receiver, webSocketMessagePayload.content,webSocketMessagePayload.receivedDate);
-                        if(webSocketMessagePayload.sender == currentUser || webSocketMessagePayload.sender == contactUser)
-                            displayMessage(webSocketMessagePayload.sender,webSocketMessagePayload.receiver,webSocketMessagePayload.receivedDate);
-                        break;
-                    case "allConnectedUsers":
-                        cleanOnlineUsers(); 
-                        for (var i = 0; i < webSocketMessagePayload.usernames.length; i++) {
-                            displayOnlineUsers(webSocketMessagePayload.usernames[i]);
-                        }
-                        if(webSocketMessagePayload.usernames.includes(contactUser) == false ){
-                            deleteConservationScreen();
-                        }
-                        break;    
-                }
+            if (socket) {
+                socket.close();
             }
-        };
-    }
 
-    function sendMessage() {
+            var title = document.getElementById("title");
 
-        var text = document.getElementById("message").value;
-        document.getElementById("message").value = "";
+            var signOut = document.createElement("button");
+            signOut.setAttribute("class", "signOut");
+            signOut.setAttribute("onclick", "signOut()");
+            signOut.innerHTML = "Sign Out";
 
-		var date = new Date();
-		var currentDate = date.getFullYear()+'-'+("0" + (date.getMonth() + 1)).slice(-2)+'-'+("0" + date.getDate()).slice(-2);
-		var webSocketMessage = {
-            type:"message",
-            content: text, 
-            sender : currentUser ,
-            receiver : contactUser,
-            receivedDate: currentDate 
+            title.appendChild(signOut);
+
+            var currentUserToTitle = document.createElement("span");
+            currentUserToTitle.setAttribute("class", "currentUserToTitle");
+            currentUserToTitle.innerHTML = currentUser;
+
+
+            title.appendChild(currentUserToTitle);
+
+            socket = new WebSocket("ws://localhost:8080/WebSocketApp/chat");
+
+            socket.onopen = function (event) {
+                document.getElementById("authentication").style.display = "none";
+                document.getElementById("contacts").style.display = "block";
+                addConnectedUser(currentUser);
             };
-        if(text != ""){
+
+
+            socket.onmessage = function (event) {
+
+                if (typeof event.data === "string") {
+                    var webSocketMessage = JSON.parse(event.data);
+                    var webSocketMessagePayload = webSocketMessage.payload;
+                    switch (webSocketMessage.type) {
+                        case "message":
+                            addMessageToAllMessages(webSocketMessagePayload.sender, webSocketMessagePayload.receiver, webSocketMessagePayload.content, webSocketMessagePayload.receivedDate);
+                            if (webSocketMessagePayload.sender == currentUser || webSocketMessagePayload.sender == contactUser)
+                                displayMessage(webSocketMessagePayload.sender, webSocketMessagePayload.receiver, webSocketMessagePayload.receivedDate);
+                            else
+                                addAlertToContact(webSocketMessagePayload.sender);
+                            break;
+                        case "allConnectedUsers":
+                            //cleanOnlineUsers();
+                            for (var i = 0; i < webSocketMessagePayload.usernames.length; i++) {
+                                displayOnlineUsers(webSocketMessagePayload.usernames[i]);
+                            }
+                            if (webSocketMessagePayload.usernames.includes(contactUser) == false) {
+                                deleteConservationScreen();
+                            }
+                            break;
+                    }
+                }
+            };
+        }
+
+        function sendMessage() {
+
+            var text = document.getElementById("message").value;
+            document.getElementById("message").value = "";
+
+            var date = new Date();
+            var currentDate = date.getFullYear() + '-' + ("0" + (date.getMonth() + 1)).slice(-2) + '-' + ("0" + date.getDate()).slice(-2);
+            var webSocketMessage = {
+                type: "message",
+                content: text,
+                sender: currentUser,
+                receiver: contactUser,
+                receivedDate: currentDate
+            };
+            if (text != "") {
+                socket.send(JSON.stringify(webSocketMessage));
+            }
+        }
+
+        function addMessageToAllMessages(sender, receiver, text, deliveryDate) {
+
+            var date = new Date();
+            var currentTime = ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
+
+            var newMessage = {
+                sender: sender,
+                receiver: receiver,
+                content: text,
+                receivedDate: deliveryDate,
+                receivedTime: currentTime
+            };
+
+            allMessages.push(newMessage);
+
+        }
+
+        function displayMessage(peerOne, peerTwo, receivedDate) {
+
+            var lastMessageTime = "";
+            var lastMessageSender = "";
+
+            deleteConservationScreen();
+            createConservationScreen();
+
+            messages = document.getElementById("messages");
+
+            allMessages.forEach(function (item) {
+                if ((peerOne == item.sender && peerTwo == item.receiver) || (peerTwo == item.sender && peerOne == item.receiver)) {
+
+                    var sentByCurrentUser = currentUser === item.sender;
+
+                    var message = document.createElement("div");
+                    message.setAttribute("class", sentByCurrentUser === true ? "message sent" : "message received");
+
+                    var content = document.createElement("span");
+                    content.setAttribute("class", "content");
+                    content.appendChild(document.createTextNode(item.content));
+                    message.appendChild(content);
+
+                    if (item.receivedTime == lastMessageTime && item.sender == lastMessageSender) {
+                        var time = document.getElementsByClassName("time");
+                        var i = time.length - 1;
+                        time[i].parentElement.removeChild(time[i]);
+                    }
+
+                    var time = document.createElement("span");
+                    time.setAttribute("class", "time");
+                    time.appendChild(document.createTextNode(item.receivedTime));
+                    message.appendChild(time);
+
+                    messages.appendChild(message);
+
+                    lastMessageTime = item.receivedTime;
+                    lastMessageSender = item.sender;
+                }
+
+            });
+
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function addConnectedUser(currentUser) {
+            var webSocketMessage = {
+                type: "connectedUser",
+                username: currentUser
+            };
             socket.send(JSON.stringify(webSocketMessage));
+
         }
-    }
 
-    function addMessageToAllMessages(sender,receiver, text, deliveryDate) {
-        
-        var date = new Date();
-        var currentTime = ("0"+date.getHours()).slice(-2) + ":" + ("0"+date.getMinutes()).slice(-2) + ":" + ("0"+date.getSeconds()).slice(-2);
+        function displayOnlineUsers(username) {
 
-        var newMessage = {
-            sender : sender,
-            receiver : receiver,
-            content : text,
-            receivedDate : deliveryDate,
-            receivedTime : currentTime
-        };
+            var contacts = document.getElementById("contacts");
+            var contact = document.getElementsByClassName("contact");
+            var isUserExist = false;
 
-        allMessages.push(newMessage);
 
-    }
-
-    function displayMessage(peerOne,peerTwo,receivedDate) {
-
-        
-        deleteConservationScreen();
-        createConservationScreen();
-
-        messages = document.getElementById("messages");
-        
-        allMessages.forEach(function(item) {
-            if((peerOne == item.sender && peerTwo == item.receiver) || (peerTwo == item.sender && peerOne == item.receiver)) {
-
-                var sentByCurrentUser = currentUser === item.sender;
-
-                var message = document.createElement("div");
-                message.setAttribute("class", sentByCurrentUser === true ? "message sent" : "message received");
-
-                var content = document.createElement("span");
-                content.setAttribute("class", "content");
-                content.appendChild(document.createTextNode(item.content));
-                message.appendChild(content);
-
-                var time = document.createElement("span");
-                time.setAttribute("class", "time");
-                time.appendChild(document.createTextNode(item.receivedTime));
-                message.appendChild(time);
-
-                if(messages.hasChildNodes() == true) {
-                    var lastMessage = messages.lastChild;
+            for (var i = 0; i < contact.length; i++) {
+                if (contact[i].firstChild.innerText == username) {
+                    isUserExist = true;
                 }
 
-                if (lastMessage && lastMessage.dataset.sender && lastMessage.dataset.sender === item.sender) {
-                    message.className += " same-sender-previous-message";
+            }
+
+            if (contacts.hasChildNodes() == false) {
+                var contactsTitle = document.createElement("div");
+                contactsTitle.setAttribute("class", "contacts-title");
+                contactsTitle.innerHTML = "Chats";
+                contacts.appendChild(contactsTitle);
+            }
+
+            if (isUserExist == false && currentUser != username) {
+                var contact = document.createElement("div");
+                contact.setAttribute("class", "contact");
+
+                var name = document.createElement("span");
+                name.setAttribute("class", "name");
+                name.appendChild(document.createTextNode(username));
+                contact.appendChild(name);
+                contact.addEventListener("click", function () {
+                    contactUser = username;
+                    removeAlertToContact(contactUser);
+                    displayMessage(currentUser, contactUser);
+                })
+
+                contacts.appendChild(contact);
+            }
+
+            addBackgroundColorToContact();
+
+        }
+
+        function addBackgroundColorToContact() {
+
+            var contact = document.getElementsByClassName("contact");
+
+            for (var i = 0; i < contact.length; i++) {
+                if (contact[i].innerText == contactUser) {
+                    contact[i].style.backgroundColor = "rgb(168, 218, 235)";
+                    contact[i].style.borderRadius = "10px";
                 }
-
-                messages.appendChild(message);
-
+                else {
+                    contact[i].style.backgroundColor = "";
+                }
             }
-                
-        });
 
-        messages.scrollTop = messages.scrollHeight;
-    }
-
-    function addConnectedUser(currentUser){
-        var webSocketMessage = {
-            type:"connectedUser",
-            username:currentUser
-        };
-        socket.send(JSON.stringify(webSocketMessage));
-
-    }
-
-    function displayOnlineUsers(username) {
-        
-        var contacts = document.getElementById("contacts");
-
-        if(currentUser != username) {
-            var contact = document.createElement("div");
-            contact.setAttribute("class", "contact");
-
-            var content = document.createElement("span");
-            content.setAttribute("class", "name");
-            content.appendChild(document.createTextNode(username));
-            contact.appendChild(content);
-            contact.addEventListener("click",function() {
-                contactUser = username;
-                displayMessage(currentUser,contactUser);
-            })
-
-        contacts.appendChild(contact);
         }
 
-        addBackgroundColorToContact();
+        function addAlertToContact(sender) {
 
-    }
+            var contact = document.getElementsByClassName("contact");
 
-    function addBackgroundColorToContact() {
-
-        var contacts = document.getElementsByClassName("contact");
-
-        
-        
-        for(var i=0 ; i < contacts.length ; i++) {
-            if(contacts[i].innerText == contactUser) {
-                contacts[i].style.backgroundColor = "rgb(168, 218, 235)";
-                contacts[i].style.borderRadius = "10px";
+            for (var i = 0; i < contact.length; i++) {
+                if (contact[i].innerText == sender) {
+                    var unread = document.createElement("div");
+                    unread.setAttribute("class", "unread");
+                    contact[i].appendChild(unread);
+                }
             }
-            else {
-                contacts[i].style.backgroundColor = "";
-            }
+
         }
 
-    }
+        function removeAlertToContact(sender) {
 
-    function deleteConservationScreen() {
-
-        var messages = document.getElementById("messages");
-
-        if(document.body.contains(messages) == true) {
-            var allMessagesOnTheScreen = document.getElementById("messages");
-            while (allMessagesOnTheScreen.hasChildNodes() == true) {
-                allMessagesOnTheScreen.removeChild(allMessagesOnTheScreen.firstChild);
+            var contact = document.getElementsByClassName("contact");
+            
+            for (var i = 0; i < contact.length; i++) {
+                if (contact[i].innerText == sender && contact[i].getElementsByClassName("unread").length == 1 ) {
+                    contact[i].removeChild(contact[i].childNodes[1]);
+                }
             }
+
         }
 
-    }
+        function deleteConservationScreen() {
 
-    function createConservationScreen() {
+            var messages = document.getElementById("messages");
 
-        addBackgroundColorToContact();
-
-        var chat = document.getElementById("chat");
-        var messages = document.getElementById("messages");
-        
-
-        if(document.body.contains(messages) == true) {
-            while (chat.hasChildNodes() == true) {
-                chat.removeChild(chat.firstChild);
+            if (document.body.contains(messages) == true) {
+                var allMessagesOnTheScreen = document.getElementById("messages");
+                while (allMessagesOnTheScreen.hasChildNodes() == true) {
+                    allMessagesOnTheScreen.removeChild(allMessagesOnTheScreen.firstChild);
+                }
             }
+
         }
 
+        function createConservationScreen() {
 
-        var messages = document.createElement("div");
-        messages.setAttribute("id","messages");
+            addBackgroundColorToContact();
 
-        chat.append(messages);
+            var chat = document.getElementById("chat");
+            var messages = document.getElementById("messages");
 
-        var chatControls = document.createElement("form");
-        chatControls.setAttribute("id","chat-controls");
-        chatControls.setAttribute("onsubmit","return false;");
 
-        var text = document.createElement("input");
-        text.setAttribute("type","text");
-        text.setAttribute("id","message");
-        text.setAttribute("placeholder","Enter a message");
+            if (document.body.contains(messages) == true) {
+                while (chat.hasChildNodes() == true) {
+                    chat.removeChild(chat.firstChild);
+                }
+            }
 
-        var button = document.createElement("button");
-        button.setAttribute("class","button");
-        button.setAttribute("onclick","sendMessage()");
-        button.innerHTML = "Send";
 
-        chatControls.appendChild(text);
-        chatControls.appendChild(button);
+            var messages = document.createElement("div");
+            messages.setAttribute("id", "messages");
 
-        chat.appendChild(chatControls);
+            chat.append(messages);
 
-        document.getElementById("chat").style.display = "block";
-        document.getElementById("message").focus();
+            var chatControls = document.createElement("form");
+            chatControls.setAttribute("id", "chat-controls");
+            chatControls.setAttribute("onsubmit", "return false;");
 
-    }
+            var text = document.createElement("input");
+            text.setAttribute("type", "text");
+            text.setAttribute("id", "message");
+            text.setAttribute("placeholder", "Enter a message");
 
-    function cleanOnlineUsers() {
-        var contacts = document.getElementById("contacts");
-        while (contacts.hasChildNodes()) {
-            contacts.removeChild(contacts.lastChild);
+            var button = document.createElement("button");
+            button.setAttribute("class", "button");
+            button.setAttribute("onclick", "sendMessage()");
+            button.innerHTML = "Send";
+
+            chatControls.appendChild(text);
+            chatControls.appendChild(button);
+
+            chat.appendChild(chatControls);
+
+            document.getElementById("chat").style.display = "block";
+            document.getElementById("message").focus();
+
         }
-        var contactsTitle = document.createElement("div");
-        contactsTitle.setAttribute("class","contacts-title");
-        contactsTitle.innerHTML = "Chats";
-        contacts.appendChild(contactsTitle);
-    }
 
-</script>
+        function cleanOnlineUsers() {
+            var contacts = document.getElementById("contacts");
+            while (contacts.hasChildNodes()) {
+                contacts.removeChild(contacts.lastChild);
+            }
+            var contactsTitle = document.createElement("div");
+            contactsTitle.setAttribute("class", "contacts-title");
+            contactsTitle.innerHTML = "Chats";
+            contacts.appendChild(contactsTitle);
+        }
+
+    </script>
 
 </body>
+
 </html>
