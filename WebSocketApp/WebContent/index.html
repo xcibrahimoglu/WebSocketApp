@@ -22,7 +22,8 @@
             font-size: 12px;
         }
 
-        input[type="text"] {
+        input[type="text"],
+        input[type="password"] {
             border-radius: 20px;
             padding: 10px;
             border: 2px solid gainsboro;
@@ -194,18 +195,19 @@
             opacity: 0.5;
         }
 
-        #messages .message.event .content {
-            background-color: #FF7E29;
-            color: #fff;
-            margin-left: auto;
-            margin-right: auto;
-            font-size: 10px;
-            padding: 7px;
-        }
-
         #messages .message.received {
             left: 0;
             text-align: left;
+        }
+
+        #messages .day .content {
+            background-color: #FF7E29;
+            color: #fff;
+            border-radius: 10px;
+            margin-left: auto;
+            margin-right: auto;
+            font-size: 10px;
+            padding: 3px;
         }
 
         #messages .message.received .content {
@@ -243,7 +245,12 @@
         }
 
         #chat-controls input[type="text"] {
-            width: calc(100% - 9em);
+            width: calc(80% - 9em);
+        }
+
+        #chat-controls input[type="file"] {
+            width: 10%;
+            left : 0;
         }
 
         #messages .message.sent.same-sender-previous-message .sender,
@@ -264,6 +271,7 @@
 
     <form id="authentication" onsubmit="return false;">
         <input type="text" id="username" placeholder="Username" autofocus />
+        <input type="password" id="password" placeholder="Password"/>
         <button class="button" onclick="signIn()">Sign In</button>
         <span class="error" id="authentication-error"></span>
     </form>
@@ -281,13 +289,44 @@
 
         function signIn() {
 
-            currentUser = document.getElementById("username").value;
-            openSocket();
+            var credentials = {
+                username: document.getElementById("username").value,
+                password: document.getElementById("password").value
+            };
+
+            var request = new XMLHttpRequest();
+            request.withCredentials = true;
+            request.addEventListener("readystatechange", function () {
+                if (request.readyState === XMLHttpRequest.DONE) {
+                    switch (request.status) {
+                        case 200:
+                            currentUser = credentials.username;
+                            var webSocketAccessToken = JSON.parse(request.responseText);
+                            openSocket(webSocketAccessToken.token);
+                            break;
+                        case 403:
+                            currentUser = null;
+                            document.getElementById("authentication-error").innerHTML = "Oops... These credentials are invalid.";
+                            break;
+                        default:
+                            document.getElementById("authentication-error").innerHTML = "Oops... Looks like something is broken.";
+                    }
+                }
+            });
+            request.open("POST", "http://localhost:8080/WebSocketApp/auth");
+            request.setRequestHeader("content-type", "application/json");
+            request.setRequestHeader("accept", "application/json");
+            request.send(JSON.stringify(credentials));
+
         }
 
         function signOut() {
             document.getElementById("authentication").style.display = "block";
             document.getElementById("contacts").style.display = "none";
+            var contacts = document.getElementById("contacts");
+            while (contacts.hasChildNodes()) {
+                contacts.removeChild(contacts.lastChild);
+            }
 
             var title = document.getElementById("title");
             title.removeChild(title.lastChild);
@@ -298,36 +337,44 @@
                 chat.removeChild(chat.lastChild);
             }
 
+            currentUser = "";
+            contactUser = "";
+
             socket.close();
         }
 
-        function openSocket() {
+        function openSocket(accessToken) {
 
             if (socket) {
                 socket.close();
             }
 
-            var title = document.getElementById("title");
+           
 
-            var signOut = document.createElement("button");
-            signOut.setAttribute("class", "signOut");
-            signOut.setAttribute("onclick", "signOut()");
-            signOut.innerHTML = "Sign Out";
+            socket = new WebSocket("ws://localhost:8080/WebSocketApp/chat?access-token=" + accessToken);
 
-            title.appendChild(signOut);
-
-            var currentUserToTitle = document.createElement("span");
-            currentUserToTitle.setAttribute("class", "currentUserToTitle");
-            currentUserToTitle.innerHTML = currentUser;
-
-
-            title.appendChild(currentUserToTitle);
-
-            socket = new WebSocket("ws://localhost:8080/WebSocketApp/chat");
+            socket.binaryType = "arraybuffer";
 
             socket.onopen = function (event) {
                 document.getElementById("authentication").style.display = "none";
                 document.getElementById("contacts").style.display = "block";
+
+                var title = document.getElementById("title");
+
+                var signOut = document.createElement("button");
+                signOut.setAttribute("class", "signOut");
+                signOut.setAttribute("onclick", "signOut()");
+                signOut.innerHTML = "Sign Out";
+
+                title.appendChild(signOut);
+
+                var currentUserToTitle = document.createElement("span");
+                currentUserToTitle.setAttribute("class", "currentUserToTitle");
+                currentUserToTitle.innerHTML = currentUser;
+
+
+                title.appendChild(currentUserToTitle);
+
                 addConnectedUser(currentUser);
             };
 
@@ -339,20 +386,17 @@
                     var webSocketMessagePayload = webSocketMessage.payload;
                     switch (webSocketMessage.type) {
                         case "message":
-                            addMessageToAllMessages(webSocketMessagePayload.sender, webSocketMessagePayload.receiver, webSocketMessagePayload.content, webSocketMessagePayload.receivedDate);
+                            addMessageToAllMessages(webSocketMessagePayload.sender, webSocketMessagePayload.receiver, webSocketMessagePayload.contentType, webSocketMessagePayload.content, webSocketMessagePayload.receivedDate);
                             if (webSocketMessagePayload.sender == currentUser || webSocketMessagePayload.sender == contactUser)
-                                displayMessage(webSocketMessagePayload.sender, webSocketMessagePayload.receiver, webSocketMessagePayload.receivedDate);
+                                displayMessage(webSocketMessagePayload.sender, webSocketMessagePayload.receiver, webSocketMessagePayload.contentType, webSocketMessagePayload.receivedDate);
                             else
                                 addAlertToContact(webSocketMessagePayload.sender);
                             break;
-                        case "allConnectedUsers":
-                            //cleanOnlineUsers();
-                            for (var i = 0; i < webSocketMessagePayload.usernames.length; i++) {
-                                displayOnlineUsers(webSocketMessagePayload.usernames[i]);
-                            }
-                            if (webSocketMessagePayload.usernames.includes(contactUser) == false) {
-                                deleteConservationScreen();
-                            }
+                        case "connectedUser":
+                            addUserToContact(webSocketMessagePayload.username);
+                            break;
+                        case "disconnectedUser":
+                            removeUserFromContact(webSocketMessagePayload.username);
                             break;
                     }
                 }
@@ -361,24 +405,43 @@
 
         function sendMessage() {
 
+            var messageContent;
+            var contentType;
             var text = document.getElementById("message").value;
-            document.getElementById("message").value = "";
+            var fileInput = document.getElementById("file");
+
+            if(fileInput.files.length > 0) {
+                contentType = "img";
+
+                var reader = new FileReader();
+                reader.onloadend = function (e) {
+                var arrayBuffer = e.target.result;
+                };
+                reader.readAsArrayBuffer(fileInput.files[0]);
+                var messageContent = reader;
+            }
+            else {// text 
+                contentType = "text";
+                messageContent = text;
+                document.getElementById("message").value = "";
+            }
 
             var date = new Date();
             var currentDate = date.getFullYear() + '-' + ("0" + (date.getMonth() + 1)).slice(-2) + '-' + ("0" + date.getDate()).slice(-2);
             var webSocketMessage = {
                 type: "message",
-                content: text,
+                contentType: contentType,
+                content: messageContent,
                 sender: currentUser,
                 receiver: contactUser,
                 receivedDate: currentDate
             };
-            if (text != "") {
+            if (text != "" || fileInput.files.length > 0) {
                 socket.send(JSON.stringify(webSocketMessage));
             }
         }
 
-        function addMessageToAllMessages(sender, receiver, text, deliveryDate) {
+        function addMessageToAllMessages(sender, receiver, contentType,content, deliveryDate) {
 
             var date = new Date();
             var currentTime = ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
@@ -386,7 +449,8 @@
             var newMessage = {
                 sender: sender,
                 receiver: receiver,
-                content: text,
+                contentType : contentType,
+                content: content,
                 receivedDate: deliveryDate,
                 receivedTime: currentTime
             };
@@ -395,8 +459,9 @@
 
         }
 
-        function displayMessage(peerOne, peerTwo, receivedDate) {
+        function displayMessage(peerOne, peerTwo, contentType, receivedDate) {
 
+            var lastMessageDate = "";
             var lastMessageTime = "";
             var lastMessageSender = "";
 
@@ -410,12 +475,36 @@
 
                     var sentByCurrentUser = currentUser === item.sender;
 
+                    var date = item.receivedDate.split(',')[0];
+
+                    if (item.receivedDate != lastMessageDate) {
+                        var day = document.createElement("div");
+                        day.setAttribute("class","day");
+
+                        var dateContent = document.createElement("span");
+                        dateContent.setAttribute("class", "content");
+                        dateContent.appendChild(document.createTextNode(date));
+                        day.appendChild(dateContent);
+
+                        messages.appendChild(day);
+                    }
+
+                    
+
                     var message = document.createElement("div");
                     message.setAttribute("class", sentByCurrentUser === true ? "message sent" : "message received");
 
                     var content = document.createElement("span");
                     content.setAttribute("class", "content");
-                    content.appendChild(document.createTextNode(item.content));
+
+                    if(item.contentType == "img") {
+                        var url = URL.createObjectURL(new Blob([item.content]));
+                        content.innerHTML += `<img src="${url}"/>`;
+                    }
+                    else {
+                        content.appendChild(document.createTextNode(item.content));
+                    }
+
                     message.appendChild(content);
 
                     if (item.receivedTime == lastMessageTime && item.sender == lastMessageSender) {
@@ -431,6 +520,7 @@
 
                     messages.appendChild(message);
 
+                    lastMessageDate = item.receivedDate;
                     lastMessageTime = item.receivedTime;
                     lastMessageSender = item.sender;
                 }
@@ -449,19 +539,10 @@
 
         }
 
-        function displayOnlineUsers(username) {
-
+        function addUserToContact(username) {
             var contacts = document.getElementById("contacts");
             var contact = document.getElementsByClassName("contact");
             var isUserExist = false;
-
-
-            for (var i = 0; i < contact.length; i++) {
-                if (contact[i].firstChild.innerText == username) {
-                    isUserExist = true;
-                }
-
-            }
 
             if (contacts.hasChildNodes() == false) {
                 var contactsTitle = document.createElement("div");
@@ -470,7 +551,14 @@
                 contacts.appendChild(contactsTitle);
             }
 
-            if (isUserExist == false && currentUser != username) {
+            for (var i = 0; i < contact.length; i++) {
+                if (contact[i].firstChild.innerText == username) {
+                    isUserExist = true;
+                }
+
+            }
+            
+            if (currentUser != username && isUserExist == false) {
                 var contact = document.createElement("div");
                 contact.setAttribute("class", "contact");
 
@@ -486,10 +574,25 @@
 
                 contacts.appendChild(contact);
             }
-
-            addBackgroundColorToContact();
-
         }
+
+        function removeUserFromContact(username) {
+            var contacts = document.getElementById("contacts");
+            var contact = document.getElementsByClassName("contact");
+
+            for (var i = 0; i < contact.length; i++) {
+                if (contact[i].firstChild.innerText == username) {
+                    contacts.removeChild(contact[i]);
+                }
+
+            }
+
+            if(contactUser == username) {
+                deleteConservationScreen();
+                contactUser = "";
+            }
+        }
+
 
         function addBackgroundColorToContact() {
 
@@ -526,7 +629,7 @@
             var contact = document.getElementsByClassName("contact");
             
             for (var i = 0; i < contact.length; i++) {
-                if (contact[i].innerText == sender && contact[i].getElementsByClassName("unread").length == 1 ) {
+                if (contact[i].innerText == sender && contact[i].getElementsByClassName("unread").length >= 1 ) {
                     contact[i].removeChild(contact[i].childNodes[1]);
                 }
             }
@@ -535,12 +638,11 @@
 
         function deleteConservationScreen() {
 
-            var messages = document.getElementById("messages");
+            var chat = document.getElementById("chat");
 
-            if (document.body.contains(messages) == true) {
-                var allMessagesOnTheScreen = document.getElementById("messages");
-                while (allMessagesOnTheScreen.hasChildNodes() == true) {
-                    allMessagesOnTheScreen.removeChild(allMessagesOnTheScreen.firstChild);
+            if (document.body.contains(chat) == true) {
+                while (chat.hasChildNodes() == true) {
+                    chat.removeChild(chat.firstChild);
                 }
             }
 
@@ -570,6 +672,11 @@
             chatControls.setAttribute("id", "chat-controls");
             chatControls.setAttribute("onsubmit", "return false;");
 
+            var file = document.createElement("input");
+            file.setAttribute("type","file");
+            file.setAttribute("id","file");
+            file.setAttribute("accept","image/*");
+
             var text = document.createElement("input");
             text.setAttribute("type", "text");
             text.setAttribute("id", "message");
@@ -580,6 +687,7 @@
             button.setAttribute("onclick", "sendMessage()");
             button.innerHTML = "Send";
 
+            chatControls.appendChild(file);
             chatControls.appendChild(text);
             chatControls.appendChild(button);
 
@@ -588,17 +696,6 @@
             document.getElementById("chat").style.display = "block";
             document.getElementById("message").focus();
 
-        }
-
-        function cleanOnlineUsers() {
-            var contacts = document.getElementById("contacts");
-            while (contacts.hasChildNodes()) {
-                contacts.removeChild(contacts.lastChild);
-            }
-            var contactsTitle = document.createElement("div");
-            contactsTitle.setAttribute("class", "contacts-title");
-            contactsTitle.innerHTML = "Chats";
-            contacts.appendChild(contactsTitle);
         }
 
     </script>

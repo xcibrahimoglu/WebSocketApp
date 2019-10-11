@@ -1,15 +1,13 @@
 package model;
 
-@SuppressWarnings("rawtypes")
-public class ConnectedUser extends WebSocketMessage{
-
-	public static final String type = "connectedUser";
+public class DisconnectedUser {
+	public static final String type = "disconnectedUser";
 	private String username;
 	
-	public ConnectedUser (String username) {
+	public DisconnectedUser (String username) {
 		this.setUsername(username);
 	}
-
+	
 	public String getUsername() {
 		return username;
 	}
@@ -17,5 +15,4 @@ public class ConnectedUser extends WebSocketMessage{
 	public void setUsername(String username) {
 		this.username = username;
 	}
-
 }

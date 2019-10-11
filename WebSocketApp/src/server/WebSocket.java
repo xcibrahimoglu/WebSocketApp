@@ -15,8 +15,8 @@ import javax.websocket.server.ServerEndpoint;
 
 import model.MessageEncoder;
 import model.WebSocketMessage;
-import model.AllConnectedUsers;
 import model.ConnectedUser;
+import model.DisconnectedUser;
 import model.Message;
 import model.MessageDecoder;
 
@@ -35,17 +35,17 @@ public class WebSocket {
     @OnClose
     public void onClose(Session session) {
         System.out.println("onClose::" +  session.getId());
-        clients.remove(session);
+        sendUserToAllClients(connectedUserInfos.get(session),false);
         connectedUserInfos.remove(session);
-        sendOnlineUsersToAllClients(connectedUserInfos);
+        clients.remove(session);
     }
     
 	@SuppressWarnings("unchecked")
 	@OnMessage
     public void handleMessage(Session session,@SuppressWarnings("rawtypes") WebSocketMessage webSocketMessage) {
-		Message textMessage = null;
+		Message<?> textMessage = null;
     	if (webSocketMessage.getPayload() instanceof Message) {
-    		textMessage = (Message) webSocketMessage.getPayload();
+    		textMessage = (Message<?>) webSocketMessage.getPayload();
    			webSocketMessage.setPayload(textMessage);
    			
    			for(Session client : clients){
@@ -56,7 +56,10 @@ public class WebSocket {
    		if(webSocketMessage.getPayload() instanceof ConnectedUser) { 
    			ConnectedUser newUser = (ConnectedUser) webSocketMessage.getPayload();
     		connectedUserInfos.put(session, newUser.getUsername());
-    		sendOnlineUsersToAllClients(connectedUserInfos);
+    		for(Session client : clients){
+    			sendUserToAllClients(connectedUserInfos.get(client),true);
+    			
+    		}
    		}    	
     }
      
@@ -71,12 +74,23 @@ public class WebSocket {
         System.out.println("onError::" + t.getMessage());
     }
     
-    public void sendOnlineUsersToAllClients(Map<Session,String> connectedUserInfos) {
-    	Set<String> connectedUserSet = new HashSet<String>(connectedUserInfos.values());
-		AllConnectedUsers allConnectedUsers = new AllConnectedUsers(connectedUserSet);
-		WebSocketMessage<AllConnectedUsers> webSocketMessage = new WebSocketMessage<AllConnectedUsers>(allConnectedUsers);
-		for(Session client : clients){
-			client.getAsyncRemote().sendObject(webSocketMessage);
-        }
+    public void sendUserToAllClients(String user, Boolean status) {
+    	if(status == true) { // it means "Online"
+    		ConnectedUser connectedUser = new ConnectedUser(user);
+    		WebSocketMessage<ConnectedUser> webSocketMessage = new WebSocketMessage<ConnectedUser>(connectedUser);
+    		
+    		for(Session client : clients){
+    			client.getAsyncRemote().sendObject(webSocketMessage);
+            }
+    	}
+    	else if(status == false){ // it means "Offline"
+    		DisconnectedUser disconnectedUser = new DisconnectedUser(user);
+    		WebSocketMessage<DisconnectedUser> webSocketMessage = new WebSocketMessage<DisconnectedUser>(disconnectedUser);
+    		
+    		for(Session client : clients){
+    			client.getAsyncRemote().sendObject(webSocketMessage);
+            }
+    	}
+		
     }
 }

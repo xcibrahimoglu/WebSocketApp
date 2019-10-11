@@ -3,18 +3,19 @@ package model;
 import java.util.Date;
 
 @SuppressWarnings("rawtypes")
-public class Message extends WebSocketMessage{
+public class Message<T> extends WebSocketMessage{
 
 	public static final String type = "message";
-    private String content;
+	private String contentType;
+    private T content;
     private String sender;
     private String receiver;
     private Date receivedDate;
     
-	public String getContent() {
+	public T getContent() {
 		return content;
 	}
-	public void setContent(String content) {
+	public void setContent(T content) {
 		this.content = content;
 	}
 	public String getSender() {
@@ -34,5 +35,11 @@ public class Message extends WebSocketMessage{
 	}
 	public void setReceiver(String receiver) {
 		this.receiver = receiver;
+	}
+	public String getContentType() {
+		return contentType;
+	}
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
 	}
 }

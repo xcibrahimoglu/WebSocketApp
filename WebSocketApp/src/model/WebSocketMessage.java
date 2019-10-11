@@ -15,8 +15,11 @@ public class WebSocketMessage<T> {
 		if (payload instanceof Message) {
 		this.setType(Message.type);
 		}
-		else if(payload instanceof AllConnectedUsers) {
-		this.setType(AllConnectedUsers.type);
+		else if(payload instanceof ConnectedUser) {
+		this.setType(ConnectedUser.type);
+		}
+		else if(payload instanceof DisconnectedUser) {
+			this.setType(DisconnectedUser.type);
 		}
 	}
 
