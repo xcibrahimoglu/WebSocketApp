@@ -12,12 +12,6 @@ public class Message<T> extends WebSocketMessage{
     private String receiver;
     private Date receivedDate;
     
-	public T getContent() {
-		return content;
-	}
-	public void setContent(T content) {
-		this.content = content;
-	}
 	public String getSender() {
 		return sender;
 	}
@@ -41,5 +35,11 @@ public class Message<T> extends WebSocketMessage{
 	}
 	public void setContentType(String contentType) {
 		this.contentType = contentType;
+	}
+	public T getContent() {
+		return content;
+	}
+	public void setContent(T content) {
+		this.content = content;
 	}
 }

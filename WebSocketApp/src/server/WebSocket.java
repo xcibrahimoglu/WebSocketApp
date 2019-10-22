@@ -41,15 +41,15 @@ public class WebSocket {
     }
     
 	@SuppressWarnings("unchecked")
-	@OnMessage
+	@OnMessage(maxMessageSize = 1024000)
     public void handleMessage(Session session,@SuppressWarnings("rawtypes") WebSocketMessage webSocketMessage) {
-		Message<?> textMessage = null;
+		Message<?> message = null;
     	if (webSocketMessage.getPayload() instanceof Message) {
-    		textMessage = (Message<?>) webSocketMessage.getPayload();
-   			webSocketMessage.setPayload(textMessage);
+    		message = (Message<?>) webSocketMessage.getPayload();
+   			webSocketMessage.setPayload(message);
    			
    			for(Session client : clients){
-   	    		if(connectedUserInfos.get(client).equalsIgnoreCase(textMessage.getReceiver()) || connectedUserInfos.get(client).equalsIgnoreCase(textMessage.getSender()))
+   	    		if(connectedUserInfos.get(client).equalsIgnoreCase(message.getReceiver()) || connectedUserInfos.get(client).equalsIgnoreCase(message.getSender()))
    	    			client.getAsyncRemote().sendObject(webSocketMessage);
    	        }
    		}

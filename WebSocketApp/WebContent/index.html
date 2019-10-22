@@ -405,43 +405,60 @@
 
         function sendMessage() {
 
-            var messageContent;
+            var textContent;
+            var imageContent;
             var contentType;
             var text = document.getElementById("message").value;
             var fileInput = document.getElementById("file");
 
-            if(fileInput.files.length > 0) {
+            if (fileInput.files.length > 0) {
                 contentType = "img";
 
+                
+
                 var reader = new FileReader();
-                reader.onloadend = function (e) {
-                var arrayBuffer = e.target.result;
-                };
                 reader.readAsArrayBuffer(fileInput.files[0]);
-                var messageContent = reader;
+                reader.onload = function (event) {
+                    imageContent = event.target.result;
+                    var imageToArray = new Uint8Array(imageContent);
+
+                    var date = new Date();
+                    var currentDate = date.getFullYear() + '-' + ("0" + (date.getMonth() + 1)).slice(-2) + '-' + ("0" + date.getDate()).slice(-2);
+                    var webSocketMessage = {
+                        type: "message",
+                        contentType: contentType,
+                        content: imageToArray,
+                        sender: currentUser,
+                        receiver: contactUser,
+                        receivedDate: currentDate
+                    };
+                    if (text != "" || fileInput.files.length > 0) {
+                        socket.send(JSON.stringify(webSocketMessage));
+                    }
+                };
             }
             else {// text 
-                contentType = "text";
-                messageContent = text;
+                contentType = "txt";
+                textContent = text;
                 document.getElementById("message").value = "";
+                var date = new Date();
+                var currentDate = date.getFullYear() + '-' + ("0" + (date.getMonth() + 1)).slice(-2) + '-' + ("0" + date.getDate()).slice(-2);
+                var webSocketMessage = {
+                    type: "message",
+                    contentType: contentType,
+                    content: textContent,
+                    sender: currentUser,
+                    receiver: contactUser,
+                    receivedDate: currentDate
+                };
+                if (text != "" || fileInput.files.length > 0) {
+                    socket.send(JSON.stringify(webSocketMessage));
+                }
             }
 
-            var date = new Date();
-            var currentDate = date.getFullYear() + '-' + ("0" + (date.getMonth() + 1)).slice(-2) + '-' + ("0" + date.getDate()).slice(-2);
-            var webSocketMessage = {
-                type: "message",
-                contentType: contentType,
-                content: messageContent,
-                sender: currentUser,
-                receiver: contactUser,
-                receivedDate: currentDate
-            };
-            if (text != "" || fileInput.files.length > 0) {
-                socket.send(JSON.stringify(webSocketMessage));
-            }
         }
 
-        function addMessageToAllMessages(sender, receiver, contentType,content, deliveryDate) {
+        function addMessageToAllMessages(sender, receiver, contentType, content , deliveryDate) {
 
             var date = new Date();
             var currentTime = ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
@@ -494,18 +511,24 @@
                     var message = document.createElement("div");
                     message.setAttribute("class", sentByCurrentUser === true ? "message sent" : "message received");
 
-                    var content = document.createElement("span");
-                    content.setAttribute("class", "content");
+                    var messageContent = document.createElement("span");
+                    messageContent.setAttribute("class", "content");
 
                     if(item.contentType == "img") {
-                        var url = URL.createObjectURL(new Blob([item.content]));
-                        content.innerHTML += `<img src="${url}"/>`;
+                        var imgContent = document.createElement("img");
+                        var blob = new Blob([item.content], { type: "image/*" });
+                        var urlCreator = window.URL || window.webkitURL;
+                        var imageUrl = urlCreator.createObjectURL(blob);
+                        imgContent.src = imageUrl;
+                        imgContent.width = "40";
+                        imgContent.height = "40";
+                        messageContent.appendChild(imgContent);
                     }
-                    else {
-                        content.appendChild(document.createTextNode(item.content));
+                    else if( contentType == "txt" ) { 
+                        messageContent.appendChild(document.createTextNode(item.content));
                     }
 
-                    message.appendChild(content);
+                    message.appendChild(messageContent);
 
                     if (item.receivedTime == lastMessageTime && item.sender == lastMessageSender) {
                         var time = document.getElementsByClassName("time");
