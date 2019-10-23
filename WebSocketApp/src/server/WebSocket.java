@@ -41,7 +41,7 @@ public class WebSocket {
     }
     
 	@SuppressWarnings("unchecked")
-	@OnMessage(maxMessageSize = 1024000)
+	@OnMessage(maxMessageSize = 6024000)
     public void handleMessage(Session session,@SuppressWarnings("rawtypes") WebSocketMessage webSocketMessage) {
 		Message<?> message = null;
     	if (webSocketMessage.getPayload() instanceof Message) {
@@ -63,12 +63,6 @@ public class WebSocket {
    		}    	
     }
      
-    @OnMessage(maxMessageSize = 1024000)
-    public byte[] handleBinaryMessage(byte[] buffer) {
-        System.out.println("New Binary Message Received");
-        return buffer;
-    }
-    
     @OnError
     public void onError(Throwable t) {
         System.out.println("onError::" + t.getMessage());

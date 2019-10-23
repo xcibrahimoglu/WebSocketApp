@@ -245,12 +245,31 @@
         }
 
         #chat-controls input[type="text"] {
-            width: calc(80% - 9em);
+            width: calc(80%);
         }
 
-        #chat-controls input[type="file"] {
-            width: 10%;
-            left : 0;
+        .inputfile {
+            width: 0.1px;
+            height: 0.1px;
+            opacity: 0;
+            overflow: hidden;
+            position: absolute;
+            z-index: -1;
+        }
+
+        .inputfile + label {
+            font-size: 13px;
+            font-weight: 700;
+            min-width: 115px;
+            max-width: 115px;
+            color: white;
+            background-color: rgb(121, 179, 233);
+            display: inline-block;
+            cursor: pointer;
+            margin-right: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            border-radius: 20px;
         }
 
         #messages .message.sent.same-sender-previous-message .sender,
@@ -414,8 +433,6 @@
             if (fileInput.files.length > 0) {
                 contentType = "img";
 
-                
-
                 var reader = new FileReader();
                 reader.readAsArrayBuffer(fileInput.files[0]);
                 reader.onload = function (event) {
@@ -516,12 +533,17 @@
 
                     if(item.contentType == "img") {
                         var imgContent = document.createElement("img");
-                        var blob = new Blob([item.content], { type: "image/*" });
+
+                        var imgArray = [];
+                        JSON.parse(JSON.stringify(item.content), (key, value) => imgArray.push(value));
+                        var imgUint = new Uint8Array(imgArray);
+
+                        var blob = new Blob([imgUint.buffer], { type: "image/*" });
                         var urlCreator = window.URL || window.webkitURL;
                         var imageUrl = urlCreator.createObjectURL(blob);
                         imgContent.src = imageUrl;
-                        imgContent.width = "40";
-                        imgContent.height = "40";
+                        imgContent.width = "100";
+                        imgContent.height = "100";
                         messageContent.appendChild(imgContent);
                     }
                     else if( contentType == "txt" ) { 
@@ -698,27 +720,49 @@
             var file = document.createElement("input");
             file.setAttribute("type","file");
             file.setAttribute("id","file");
+            file.setAttribute("class","inputfile");
             file.setAttribute("accept","image/*");
 
+            var label = document.createElement("label");
+            label.setAttribute("for","file");
+            label.innerHTML = "Choose a file...";
+
+            
             var text = document.createElement("input");
             text.setAttribute("type", "text");
             text.setAttribute("id", "message");
             text.setAttribute("placeholder", "Enter a message");
-
+            
             var button = document.createElement("button");
             button.setAttribute("class", "button");
             button.setAttribute("onclick", "sendMessage()");
             button.innerHTML = "Send";
-
+            
             chatControls.appendChild(file);
+            chatControls.appendChild(label);
             chatControls.appendChild(text);
             chatControls.appendChild(button);
 
             chat.appendChild(chatControls);
+            
+            var inputs = document.querySelectorAll('.inputfile');
+            Array.prototype.forEach.call(inputs, function (input) {
+                var label = input.nextElementSibling,
+                    labelVal = label.innerHTML;
+
+                input.addEventListener('change', function (e) {
+                    var fileName = e.target.value.split('\\' ).pop();
+
+		            if (fileName)
+                        label.innerHTML = fileName;
+                    else
+                        label.innerHTML = labelVal;
+                });
+            });
 
             document.getElementById("chat").style.display = "block";
             document.getElementById("message").focus();
-
+            
         }
 
     </script>
