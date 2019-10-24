@@ -534,6 +534,9 @@
                     if(item.contentType == "img") {
                         var imgContent = document.createElement("img");
 
+                        messageContent.setAttribute("border-radius","0px");
+                        messageContent.setAttribute("padding","2px");
+
                         var imgArray = [];
                         JSON.parse(JSON.stringify(item.content), (key, value) => imgArray.push(value));
                         var imgUint = new Uint8Array(imgArray);
@@ -542,11 +545,13 @@
                         var urlCreator = window.URL || window.webkitURL;
                         var imageUrl = urlCreator.createObjectURL(blob);
                         imgContent.src = imageUrl;
-                        imgContent.width = "100";
-                        imgContent.height = "100";
+                        imgContent.setAttribute("max-width","%100");
+                        imgContent.setAttribute("width","250px");
+                        imgContent.setAttribute("max-height","%100");
+                        imgContent.setAttribute("height","250px");
                         messageContent.appendChild(imgContent);
                     }
-                    else if( contentType == "txt" ) { 
+                    else if(item.contentType == "txt" ) { 
                         messageContent.appendChild(document.createTextNode(item.content));
                     }
 

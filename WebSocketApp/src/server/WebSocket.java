@@ -24,7 +24,6 @@ import model.MessageDecoder;
 public class WebSocket {
 	
 	static Set<Session> clients = Collections.synchronizedSet(new HashSet<Session>());
-	static Map<Session,String> connectedUserInfos = Collections.synchronizedMap(new HashMap<Session,String>());
     
     @OnOpen
     public void onOpen(Session session) {
@@ -35,8 +34,7 @@ public class WebSocket {
     @OnClose
     public void onClose(Session session) {
         System.out.println("onClose::" +  session.getId());
-        sendUserToAllClients(connectedUserInfos.get(session),false);
-        connectedUserInfos.remove(session);
+        sendUserToAllClients(session.getUserPrincipal().getName(),false);
         clients.remove(session);
     }
     
@@ -49,17 +47,14 @@ public class WebSocket {
    			webSocketMessage.setPayload(message);
    			
    			for(Session client : clients){
-   	    		if(connectedUserInfos.get(client).equalsIgnoreCase(message.getReceiver()) || connectedUserInfos.get(client).equalsIgnoreCase(message.getSender()))
+   	    		if(client.getUserPrincipal().getName().equalsIgnoreCase(message.getReceiver()) || client.getUserPrincipal().getName().equalsIgnoreCase(message.getSender()))
    	    			client.getAsyncRemote().sendObject(webSocketMessage);
    	        }
    		}
    		if(webSocketMessage.getPayload() instanceof ConnectedUser) { 
-   			ConnectedUser newUser = (ConnectedUser) webSocketMessage.getPayload();
-    		connectedUserInfos.put(session, newUser.getUsername());
-    		for(Session client : clients){
-    			sendUserToAllClients(connectedUserInfos.get(client),true);
-    			
-    		}
+   			for(Session client : clients){
+    		sendUserToAllClients(client.getUserPrincipal().getName(),true);
+   			}
    		}    	
     }
      

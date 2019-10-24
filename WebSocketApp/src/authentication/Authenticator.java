@@ -50,36 +50,35 @@ public class Authenticator {
     	        .withIssuer("auth0")
     	        .sign(algorithm);
     	    
-    	    algorithms.put(username,algorithm);
-    	    accessTokens.put(token,username );
+    	    algorithms.put(token,algorithm);
+    	    accessTokens.put(token,username);
     	} catch (JWTCreationException exception){
     	    //Invalid Signing configuration / Couldn't convert Claims.
     	}
         return token;
     }
     
-    public static Optional<String> verifyToken(String accessToken) throws IllegalArgumentException, UnsupportedEncodingException {
+    public static String getUsername(String accessToken) {
     	String username = accessTokens.getIfPresent(accessToken);
-    	if (username == null) {
-            return Optional.empty();
-        } 
-    	else {
-    		Algorithm algorithm = algorithms.getIfPresent(username);
-    		//Algorithm algorithm = Algorithm.HMAC256("secret");
-        	try {
-        	    JWTVerifier verifier = JWT.require(algorithm)
-        	        .withIssuer("auth0")
-        	        .build(); //Reusable verifier instance
-        	    @SuppressWarnings("unused")
-    			DecodedJWT jwt = verifier.verify(accessToken);
-        	    accessTokens.invalidate(accessToken); // The token can be used only once
-        	    return Optional.of(username);
+    	Optional<String> optionalUsername = Optional.ofNullable(username);
+    	return optionalUsername.orElse("");
+    }
+    
+    public static Boolean verifyToken(String accessToken) throws IllegalArgumentException, UnsupportedEncodingException {
+    	Algorithm algorithm = algorithms.getIfPresent(accessToken);
+        try {
+            JWTVerifier verifier = JWT.require(algorithm)
+                .withIssuer("auth0")
+                .build(); //Reusable verifier instance
+            @SuppressWarnings("unused")
+    		DecodedJWT jwt = verifier.verify(accessToken);
+            accessTokens.invalidate(accessToken); // The token can be used only once
+            return true;
         	    
-        	} catch (JWTVerificationException exception){
-        	    //Invalid signature/claims
-        		return Optional.empty();
-        	}
-        }
+        } catch (JWTVerificationException exception){
+       	    //Invalid signature/claims
+       		return false;
+       	}
     	
 
     }

@@ -2,7 +2,6 @@ package authentication;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.Optional;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -35,9 +34,9 @@ public class AccessTokenFilter implements Filter{
             return;
         }
 
-        Optional<String> optionalUsername = Authenticator.verifyToken(token);
-        if (optionalUsername.isPresent()) {
-            filterChain.doFilter(new AuthenticatedRequest(request, optionalUsername.get()), servletResponse);
+        String username = Authenticator.getUsername(token);
+        if (Authenticator.verifyToken(token) && username !="" ) {
+            filterChain.doFilter(new AuthenticatedRequest(request, username), servletResponse);
         } else {
             returnForbiddenError(response, "Invalid access token");
         }
