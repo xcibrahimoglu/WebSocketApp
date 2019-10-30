@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Chat</title>
+    <title>Hey Buddy!</title>
     <meta name="description" content="Chat application">
 
     <style>
@@ -278,7 +278,7 @@
         }
 
         #chat-controls input[type="text"] {
-            width: calc(80%);
+            width:calc(90% - 65px);
             min-width: 200px;
             max-width: 1100px;
             padding: 10px 0px 10px 5px;
@@ -294,17 +294,17 @@
         }
 
         .inputfile + label {
-            font-size: 23px;
+            font-size: 13px;
             font-weight: 700;
             float: left;
-            height: 19px;
             min-width: 25px;
             max-width: 50px;
             width: calc(5%);
             color: white;
             background-color: rgb(121, 179, 233);
             cursor: pointer;
-            padding-bottom: 20px;
+            padding-bottom: 10px;
+            padding-top: 10px;
             border-radius: 20px;
         }
 
@@ -408,7 +408,7 @@
 
             socket = new WebSocket("ws://localhost:8080/WebSocketApp/chat?access-token=" + accessToken);
 
-            socket.binaryType = "arraybuffer";
+            //socket.binaryType = "arraybuffer";
 
             socket.onopen = function (event) {
                 document.getElementById("authentication").style.display = "none";
@@ -743,10 +743,10 @@
                     chat.removeChild(chat.firstChild);
                 }
             }
+            chat.setAttribute("style","background-image: url(http://raiingkaeng.com/images/flamingo-wallpaper/37816565-flamingo-wallpaper.jpg)");
 
             var messages = document.createElement("div");
             messages.setAttribute("id", "messages");
-            messages.setAttribute("style","background-image: url(file:///C:/canDevelopment/workspace/WebSocketApp/WebSocketApp/WebContent/minimalist_background-wallpaper-1366x768.jpg)");
 
             chat.append(messages);
 

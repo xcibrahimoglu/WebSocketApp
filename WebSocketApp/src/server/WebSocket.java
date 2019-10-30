@@ -34,8 +34,8 @@ public class WebSocket {
     @OnClose
     public void onClose(Session session) {
         System.out.println("onClose::" +  session.getId());
-        sendUserToAllClients(session.getUserPrincipal().getName(),false);
         clients.remove(session);
+        sendUserStatusToAllClients(session.getUserPrincipal().getName(),false);
     }
     
 	@SuppressWarnings("unchecked")
@@ -53,7 +53,7 @@ public class WebSocket {
    		}
    		if(webSocketMessage.getPayload() instanceof ConnectedUser) { 
    			for(Session client : clients){
-    		sendUserToAllClients(client.getUserPrincipal().getName(),true);
+    		sendUserStatusToAllClients(client.getUserPrincipal().getName(),true);
    			}
    		}    	
     }
@@ -63,7 +63,7 @@ public class WebSocket {
         System.out.println("onError::" + t.getMessage());
     }
     
-    public void sendUserToAllClients(String user, Boolean status) {
+    public void sendUserStatusToAllClients(String user, Boolean status) {
     	if(status == true) { // it means "Online"
     		ConnectedUser connectedUser = new ConnectedUser(user);
     		WebSocketMessage<ConnectedUser> webSocketMessage = new WebSocketMessage<ConnectedUser>(connectedUser);
