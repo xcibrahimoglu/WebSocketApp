@@ -108,7 +108,7 @@
                         	var accessToken = webSocketAccessToken.token;
                           	document.getElementById("access-token").value = accessToken;
                           	var form = document.getElementById("authentication");
-                          	form.setAttribute("action","http://localhost:8080/WebSocketApp/Chat.jsp");
+                          	form.setAttribute("action","http://localhost:8080/WebSocketApp/Chat");
                           	form.method="post";
                             form.submit();
                             break;

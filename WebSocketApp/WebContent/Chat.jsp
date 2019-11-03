@@ -4,6 +4,7 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
+<meta name="description" content="Chat application">
 <title>Hey Buddy!</title>
 
 <style>
@@ -61,6 +62,7 @@
             font-size: 13px;
             font-weight: normal;
             padding: 4px 5px 4px 5px; 
+            margin-top: -23px;
             border-radius: 10px;
             background-color: rgb(154, 212, 231);
         }
@@ -72,6 +74,7 @@
             border-radius: 20px;
             padding: 5px;
             margin-left: 5px;
+            margin-top: -23px;
             color: #fff;
         }
 
@@ -337,17 +340,21 @@
           document.getElementById("contacts").style.display = "block";
 
           var title = document.getElementById("title");
-
+          
+		  var buttonForm = document.createElement("form");
+		  buttonForm.setAttribute("action","http://localhost:8080/WebSocketApp/Auth.jsp");
+		  buttonForm.method="post";
           var signOut = document.createElement("button");
           signOut.setAttribute("class", "signOut");
+          buttonForm.appendChild(signOut);
           signOut.onclick = function() {
         	  socket.close();
-              <%request.getRequestDispatcher("/Auth.jsp").forward(request, response);%>
+        	  buttonForm.submit();
           }
           
           signOut.innerHTML = "Sign Out";
 
-          title.appendChild(signOut);
+          title.appendChild(buttonForm);
 
           var currentUserToTitle = document.createElement("span");
           currentUserToTitle.setAttribute("class", "currentUserToTitle");
