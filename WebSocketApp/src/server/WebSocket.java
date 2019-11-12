@@ -13,17 +13,19 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
-import model.MessageEncoder;
+import codec.MessageDecoder;
+import codec.MessageEncoder;
 import model.WebSocketMessage;
 import model.ConnectedUser;
+import model.DatabaseOperations;
 import model.DisconnectedUser;
 import model.Message;
-import model.MessageDecoder;
 
 @ServerEndpoint(value = "/chat", encoders = MessageEncoder.class, decoders = MessageDecoder.class)
 public class WebSocket {
 	
 	static Set<Session> clients = Collections.synchronizedSet(new HashSet<Session>());
+	DatabaseOperations Database = DatabaseOperations.getInstance(); // connect DB
     
     @OnOpen
     public void onOpen(Session session) {
@@ -37,14 +39,17 @@ public class WebSocket {
         clients.remove(session);
         sendUserStatusToAllClients(session.getUserPrincipal().getName(),false);
     }
-    
+
 	@SuppressWarnings("unchecked")
 	@OnMessage(maxMessageSize = 6024000)
     public void handleMessage(Session session,@SuppressWarnings("rawtypes") WebSocketMessage webSocketMessage) {
 		Message<?> message = null;
     	if (webSocketMessage.getPayload() instanceof Message) {
+    		
     		message = (Message<?>) webSocketMessage.getPayload();
    			webSocketMessage.setPayload(message);
+   			
+   			Database.createDocument(webSocketMessage);
    			
    			for(Session client : clients){
    	    		if(client.getUserPrincipal().getName().equalsIgnoreCase(message.getReceiver()) || client.getUserPrincipal().getName().equalsIgnoreCase(message.getSender()))

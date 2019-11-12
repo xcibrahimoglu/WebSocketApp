@@ -1,7 +1,6 @@
 package model;
 
-
-public class WebSocketMessage<T> { 
+public class WebSocketMessage<T>{ 
 	
 	private String type;
 	private T payload;

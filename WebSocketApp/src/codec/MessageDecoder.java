@@ -1,4 +1,4 @@
-package model;
+package codec;
 
 import java.lang.reflect.Type;
 
@@ -9,6 +9,10 @@ import javax.websocket.EndpointConfig;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+
+import model.ConnectedUser;
+import model.Message;
+import model.WebSocketMessage;
 
 @SuppressWarnings("rawtypes")
 public class MessageDecoder implements Decoder.Text<WebSocketMessage> {

@@ -75,7 +75,7 @@ public class Authenticator {
             accessTokens.invalidate(accessToken); // The token can be used only once
             return true;
         	    
-        } catch (JWTVerificationException exception){
+        } catch (Exception exception){
        	    //Invalid signature/claims
        		return false;
        	}

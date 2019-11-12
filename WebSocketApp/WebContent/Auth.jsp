@@ -121,7 +121,7 @@
                     }
                 }
             });
-            request.open("POST", "http://localhost:8080/WebSocketApp/auth");
+            request.open("POST", "http://localhost:8080/WebSocketApp/Authentication");
             request.setRequestHeader("content-type", "application/json");
             request.setRequestHeader("accept", "application/json");
             request.send(JSON.stringify(credentials));

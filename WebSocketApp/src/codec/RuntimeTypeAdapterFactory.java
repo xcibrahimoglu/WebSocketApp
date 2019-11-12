@@ -1,4 +1,4 @@
-package model;
+package codec;
 
 /*
  * Copyright (C) 2011 Google Inc.

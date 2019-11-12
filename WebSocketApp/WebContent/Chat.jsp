@@ -310,9 +310,9 @@
 
  <div id="title">Hey Buddy!</div>
 
-    <div id="contacts"></div>
+ <div id="contacts"></div>
 
-    <div id="chat"></div>
+ <div id="chat"></div>
 
   <script type="text/javascript">
   var socket;
@@ -334,7 +334,6 @@
 
       socket = new WebSocket("ws://localhost:8080/WebSocketApp/chat?access-token=" + accessToken);
 
-      //socket.binaryType = "arraybuffer";
 
       socket.onopen = function (event) {
           document.getElementById("contacts").style.display = "block";
@@ -342,7 +341,7 @@
           var title = document.getElementById("title");
           
 		  var buttonForm = document.createElement("form");
-		  buttonForm.setAttribute("action","http://localhost:8080/WebSocketApp/Auth.jsp");
+		  buttonForm.setAttribute("action","http://localhost:8080/WebSocketApp/Auth");
 		  buttonForm.method="post";
           var signOut = document.createElement("button");
           signOut.setAttribute("class", "signOut");

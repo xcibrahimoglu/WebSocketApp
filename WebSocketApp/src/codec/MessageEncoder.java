@@ -1,10 +1,12 @@
-package model;
+package codec;
 
 import javax.websocket.EncodeException;
 import javax.websocket.Encoder;
 import javax.websocket.EndpointConfig;
 
 import com.google.gson.Gson;
+
+import model.WebSocketMessage;
 
 
 @SuppressWarnings("rawtypes")

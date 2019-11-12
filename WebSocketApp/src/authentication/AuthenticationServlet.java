@@ -12,7 +12,7 @@ import com.google.gson.Gson;
 /**
  * Servlet implementation class authenticationServlet
  */
-@WebServlet("/auth")
+@WebServlet("/Authentication")
 public class AuthenticationServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
