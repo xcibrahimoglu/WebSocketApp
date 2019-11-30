@@ -108,7 +108,7 @@
                         	var accessToken = webSocketAccessToken.token;
                           	document.getElementById("access-token").value = accessToken;
                           	var form = document.getElementById("authentication");
-                          	form.setAttribute("action","http://localhost:8080/WebSocketApp/Chat");
+                          	form.setAttribute("action","http://localhost:8080/HeyBuddy/Chat");
                           	form.method="post";
                             form.submit();
                             break;
@@ -121,7 +121,7 @@
                     }
                 }
             });
-            request.open("POST", "http://localhost:8080/WebSocketApp/Authentication");
+            request.open("POST", "http://localhost:8080/HeyBuddy/Authentication");
             request.setRequestHeader("content-type", "application/json");
             request.setRequestHeader("accept", "application/json");
             request.send(JSON.stringify(credentials));

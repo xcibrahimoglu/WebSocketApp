@@ -16,32 +16,33 @@ import model.WebSocketMessage;
 
 @SuppressWarnings("rawtypes")
 public class MessageDecoder implements Decoder.Text<WebSocketMessage> {
-	
-	RuntimeTypeAdapterFactory<WebSocketMessage> runtimeTypeAdapterFactory = RuntimeTypeAdapterFactory
-		    .of(WebSocketMessage.class, "type")
-		    .registerSubtype(Message.class, "message")
-		    .registerSubtype(ConnectedUser.class, "connectedUser");
-	
-	Gson gson = new GsonBuilder().registerTypeAdapterFactory(runtimeTypeAdapterFactory).create();
-	Type type = new TypeToken<WebSocketMessage>(){}.getType();
 
-    @Override
-    public WebSocketMessage decode(final String Message) throws DecodeException {
-    	@SuppressWarnings("unchecked")
-		WebSocketMessage<?> webSocketMessage = new WebSocketMessage(gson.fromJson(Message,type));
-        return webSocketMessage;
-    }
+	RuntimeTypeAdapterFactory<WebSocketMessage> runtimeTypeAdapterFactory = RuntimeTypeAdapterFactory
+			.of(WebSocketMessage.class, "type")
+			.registerSubtype(Message.class, "message")
+			.registerSubtype(ConnectedUser.class, "connectedUser");
+
+	Gson gson = new GsonBuilder().registerTypeAdapterFactory(runtimeTypeAdapterFactory).create();
+	Type type = new TypeToken<WebSocketMessage>() {
+	}.getType();
+
+	@Override
+	public WebSocketMessage decode(final String Message) throws DecodeException {
+		@SuppressWarnings("unchecked")
+		WebSocketMessage<?> webSocketMessage = new WebSocketMessage(gson.fromJson(Message, type));
+		return webSocketMessage;
+	}
 
 	@Override
 	public void destroy() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void init(EndpointConfig arg0) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
