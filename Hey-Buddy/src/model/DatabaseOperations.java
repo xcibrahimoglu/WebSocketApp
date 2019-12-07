@@ -1,7 +1,9 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistry;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
@@ -15,8 +17,7 @@ import com.mongodb.client.MongoDatabase;
 public class DatabaseOperations {
 
 	static MongoDatabase database = null;
-	@SuppressWarnings("rawtypes")
-	MongoCollection<Message> collection = null;
+	MongoCollection<Document> collection = null;
 
 	private static DatabaseOperations instance = null;
 	CodecRegistry pojoCodecRegistry = fromRegistries(MongoClient.getDefaultCodecRegistry(),
@@ -44,26 +45,50 @@ public class DatabaseOperations {
 		return instance;
 	}
 
-	public <T> void createDocument(T message) {
+	public void createDocument(Message<?> message) {
 
-		/*try {
-			collection = database.getCollection("Messages", Message.class);
-		} catch (IllegalArgumentException e) {
-			database.createCollection("Messages");
-			collection = database.getCollection("Messages", Message.class);
-		}*/
+		collection = database.getCollection("Message");
 
-		@SuppressWarnings("unchecked")
-		MongoCollection<T> collection = (MongoCollection<T>) database.getCollection(message.getClass().getSimpleName(), message.getClass());
-        collection.insertOne(message);
-        
+		Document document = new Document();
+		document.put("sender", message.getSender());
+		document.put("receiver", message.getReceiver());
+		document.put("contentType", message.getContentType());
+		document.put("content", message.getContent());
+		document.put("receivedDate", message.getReceivedDate());
+
+		collection.insertOne(document);
 
 	}
 
-	@SuppressWarnings("rawtypes")
-	public List<Message> findDocument(String[] keys, String value) {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public List<Message<?>> findDocument(String[] keys, String value) {
+		collection = database.getCollection("Message");
 
-		return null;
+		List<Document> criterias = new ArrayList<Document>();
+
+		for (String key : keys) {
+			Document document = new Document(key,value);
+			criterias.add(document);
+		}
+
+		Document query = new Document("$or",criterias);
+		List<Document> documents = new ArrayList<Document>();
+		collection.find(query).into(documents);
+		
+		List<Message<?>> messages = new ArrayList<Message<?>>();
+		
+		for(Document document: documents) {
+			Message message = new Message();
+			message.setSender(document.getString("sender"));
+			message.setReceiver(document.getString("receiver"));
+			message.setContentType(document.getString("contentType"));
+			message.setContent(document.getString("content"));
+			message.setReceivedDate(document.getString("receivedDate"));	
+			
+			messages.add(message);
+		}
+		
+		return messages;
 
 	}
 

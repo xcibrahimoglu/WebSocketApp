@@ -1,25 +1,14 @@
 package model;
 
-import java.io.Serializable;
-import java.util.Date;
-
-import org.bson.types.ObjectId;
-
-
 @SuppressWarnings("rawtypes")
-public class Message<T> extends WebSocketMessage implements Serializable {
+public class Message<T> extends WebSocketMessage {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 	public static final String type = "message";
-	private ObjectId id;
 	private String contentType;
 	private T content;
 	private String sender;
 	private String receiver;
-	private Date receivedDate;
+	private String receivedDate;
 
 	public String getSender() {
 		return sender;
@@ -29,11 +18,11 @@ public class Message<T> extends WebSocketMessage implements Serializable {
 		this.sender = sender;
 	}
 
-	public Date getReceivedDate() {
+	public String getReceivedDate() {
 		return receivedDate;
 	}
 
-	public void setReceivedDate(Date receivedDate) {
+	public void setReceivedDate(String receivedDate) {
 		this.receivedDate = receivedDate;
 	}
 
@@ -59,14 +48,6 @@ public class Message<T> extends WebSocketMessage implements Serializable {
 
 	public void setContent(T content) {
 		this.content = content;
-	}
-
-	public ObjectId getId() {
-		return id;
-	}
-
-	public void setId(ObjectId id) {
-		this.id = id;
 	}
 
 }

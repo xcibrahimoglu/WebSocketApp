@@ -317,7 +317,7 @@
   <script type="text/javascript">
   var socket;
   var currentUser;
-  var contactUser;
+  var contactUser = "";
   var allMessages = [];
   
   var accessToken = "<%=request.getParameter("access-token")%>";
@@ -374,7 +374,7 @@
               switch (webSocketMessage.type) {
                   case "message":
                       addMessageToAllMessages(webSocketMessagePayload.sender, webSocketMessagePayload.receiver, webSocketMessagePayload.contentType, webSocketMessagePayload.content, webSocketMessagePayload.receivedDate);
-                      if (webSocketMessagePayload.sender == currentUser || webSocketMessagePayload.sender == contactUser)
+                      if (contactUser != "" && (webSocketMessagePayload.sender == currentUser || webSocketMessagePayload.sender == contactUser))
                           displayMessage(webSocketMessagePayload.sender, webSocketMessagePayload.receiver, webSocketMessagePayload.contentType, webSocketMessagePayload.receivedDate);
                       else
                           addAlertToContact(webSocketMessagePayload.sender);
@@ -409,7 +409,7 @@
               var imageToArray = new Uint8Array(imageContent);
 
               var date = new Date();
-              var currentDate = date.getFullYear() + '-' + ("0" + (date.getMonth() + 1)).slice(-2) + '-' + ("0" + date.getDate()).slice(-2);
+              var currentDate = date.getFullYear() + '-' + ("0" + (date.getMonth() + 1)).slice(-2) + '-' + ("0" + date.getDate()).slice(-2) + ' ' + ("0" + date.getHours()).slice(-2) + ':' + ("0" + date.getMinutes()).slice(-2);
               var webSocketMessage = {
                   type: "message",
                   contentType: contentType,
@@ -428,7 +428,7 @@
           textContent = text;
           document.getElementById("message").value = "";
           var date = new Date();
-          var currentDate = date.getFullYear() + '-' + ("0" + (date.getMonth() + 1)).slice(-2) + '-' + ("0" + date.getDate()).slice(-2);
+          var currentDate = date.getFullYear() + '-' + ("0" + (date.getMonth() + 1)).slice(-2) + '-' + ("0" + date.getDate()).slice(-2) + ' ' + ("0" + date.getHours()).slice(-2) + ':' + ("0" + date.getMinutes()).slice(-2);
           var webSocketMessage = {
               type: "message",
               contentType: contentType,
@@ -446,16 +446,16 @@
 
   function addMessageToAllMessages(sender, receiver, contentType, content , deliveryDate) {
 
-      var date = new Date();
-      var currentTime = ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
+	  var sentDate = deliveryDate.split(' ')[0];
+	  var sentTime = deliveryDate.split(' ')[1];
 
       var newMessage = {
           sender: sender,
           receiver: receiver,
           contentType : contentType,
           content: content,
-          receivedDate: deliveryDate,
-          receivedTime: currentTime
+          receivedDate: sentDate,
+          receivedTime: sentTime
       };
 
       allMessages.push(newMessage);
@@ -478,15 +478,13 @@
 
               var sentByCurrentUser = currentUser === item.sender;
 
-              var date = item.receivedDate.split(',')[0];
-
               if (item.receivedDate != lastMessageDate) {
                   var day = document.createElement("div");
                   day.setAttribute("class","day");
 
                   var dateContent = document.createElement("span");
                   dateContent.setAttribute("class", "content");
-                  dateContent.appendChild(document.createTextNode(date));
+                  dateContent.appendChild(document.createTextNode(item.receivedDate));
                   day.appendChild(dateContent);
 
                   messages.appendChild(day);

@@ -1,13 +1,8 @@
 package model;
 
-import java.io.Serializable;
 
-public class WebSocketMessage<T>  implements Serializable {
+public class WebSocketMessage<T> {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 	private String type;
 	private T payload;
 

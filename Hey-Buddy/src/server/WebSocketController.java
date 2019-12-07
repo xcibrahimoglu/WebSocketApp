@@ -2,6 +2,7 @@ package server;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.websocket.OnClose;
@@ -23,12 +24,19 @@ import model.WebSocketMessage;
 public class WebSocketController {
 
 	static Set<Session> clients = Collections.synchronizedSet(new HashSet<Session>());
-	DatabaseOperations Database = DatabaseOperations.getInstance(); // connect DB
+	DatabaseOperations database = DatabaseOperations.getInstance(); // connect DB
 
 	@OnOpen
 	public void onOpen(Session session) {
 		System.out.println("onOpen::" + session.getId());
 		clients.add(session);
+		String[] keys = {"sender","receiver"};
+		List<Message<?>> messages = database.findDocument(keys, session.getUserPrincipal().getName());
+		for(Message<?> message : messages) {
+			WebSocketMessage<Message<?>> webSocketMessage =new WebSocketMessage<Message<?>>(message);
+			session.getAsyncRemote().sendObject(webSocketMessage);
+		}
+		
 	}
 
 	@OnClose
@@ -38,14 +46,14 @@ public class WebSocketController {
 		sendUserStatusToAllClients(session.getUserPrincipal().getName(), false);
 	}
 
-	@OnMessage(maxMessageSize = 6024000)
+	@OnMessage(maxMessageSize = 40024000)
 	public void handleMessage(Session session, @SuppressWarnings("rawtypes") WebSocketMessage webSocketMessage) {
 
 		if (webSocketMessage.getPayload() instanceof Message) {
 
 			Message<?> message = (Message<?>) webSocketMessage.getPayload();
 
-			Database.createDocument(message);
+			database.createDocument(message);
 
 			for (Session client : clients) {
 				if (client.getUserPrincipal().getName().equalsIgnoreCase(message.getReceiver())
