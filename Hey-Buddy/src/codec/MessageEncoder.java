@@ -6,7 +6,7 @@ import javax.websocket.EndpointConfig;
 
 import com.google.gson.Gson;
 
-import model.WebSocketMessage;
+import entity.WebSocketMessage;
 
 
 @SuppressWarnings("rawtypes")

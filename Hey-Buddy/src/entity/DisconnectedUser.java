@@ -1,4 +1,4 @@
-package model;
+package entity;
 
 public class DisconnectedUser {
 	public static final String type = "disconnectedUser";

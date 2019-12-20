@@ -1,4 +1,4 @@
-package server;
+package service;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -14,29 +14,29 @@ import javax.websocket.server.ServerEndpoint;
 
 import codec.MessageDecoder;
 import codec.MessageEncoder;
-import model.ConnectedUser;
-import model.DatabaseOperations;
-import model.DisconnectedUser;
-import model.Message;
-import model.WebSocketMessage;
+import entity.ConnectedUser;
+import repository.MessageRepository;
+import entity.DisconnectedUser;
+import entity.Message;
+import entity.WebSocketMessage;
 
 @ServerEndpoint(value = "/ws", encoders = MessageEncoder.class, decoders = MessageDecoder.class)
-public class WebSocketController {
+public class WebSocketService {
 
 	static Set<Session> clients = Collections.synchronizedSet(new HashSet<Session>());
-	DatabaseOperations database = DatabaseOperations.getInstance(); // connect DB
+	MessageRepository database = new MessageRepository(); // connect DB
 
 	@OnOpen
 	public void onOpen(Session session) {
 		System.out.println("onOpen::" + session.getId());
 		clients.add(session);
-		String[] keys = {"sender","receiver"};
+		String[] keys = { "sender", "receiver" };
 		List<Message<?>> messages = database.findDocument(keys, session.getUserPrincipal().getName());
-		for(Message<?> message : messages) {
-			WebSocketMessage<Message<?>> webSocketMessage =new WebSocketMessage<Message<?>>(message);
+		for (Message<?> message : messages) {
+			WebSocketMessage<Message<?>> webSocketMessage = new WebSocketMessage<Message<?>>(message);
 			session.getAsyncRemote().sendObject(webSocketMessage);
 		}
-		
+
 	}
 
 	@OnClose

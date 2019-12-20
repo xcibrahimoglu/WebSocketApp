@@ -40,6 +40,13 @@
             border-color: rgb(121, 179, 233);
             cursor: pointer;
         }
+        
+        .signUpText {
+        text-align: center;
+        padding: 10px 2.5px 0px 2.5px;
+        font-weight: normal;
+        font-size: 14px;
+        }
 
         /* Authentication */
 
@@ -53,10 +60,18 @@
             margin-right: auto;
             margin-bottom: 10px;
         }
-
+        
         #authentication .error {
             text-align: center;
         }
+        
+        #signUp * {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 10px;
+        }
+
 
         /* Title Bar */
 
@@ -81,7 +96,12 @@
         <input type="password" name="password" id="password" placeholder="Password"/>
         <input type="hidden" name="access-token" id="access-token"/>
         <button class="button" onclick="signIn()">Sign In</button>
+        <h1 class="signUpText">Join Us</h1>
         <span class="error" id="authentication-error"></span>
+    </form>
+        
+    <form id="signUp" action ="http://localhost:8080/HeyBuddy/SignUp" onclick="signUp()">
+    <button class="button">Sign Up</button>
     </form>
     
         <script>
@@ -127,6 +147,12 @@
             request.send(JSON.stringify(credentials));
 
         }
+        
+        
+        function signUp() {
+
+        }
+        
         </script>
         
 </body>

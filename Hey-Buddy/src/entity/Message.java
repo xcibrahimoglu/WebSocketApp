@@ -1,4 +1,4 @@
-package model;
+package entity;
 
 @SuppressWarnings("rawtypes")
 public class Message<T> extends WebSocketMessage {

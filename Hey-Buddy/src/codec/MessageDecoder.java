@@ -10,9 +10,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
-import model.ConnectedUser;
-import model.Message;
-import model.WebSocketMessage;
+import entity.ConnectedUser;
+import entity.Message;
+import entity.WebSocketMessage;
 
 @SuppressWarnings("rawtypes")
 public class MessageDecoder implements Decoder.Text<WebSocketMessage> {

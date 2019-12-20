@@ -17,6 +17,7 @@
     <servlet-name>ChatJsp</servlet-name>
     <url-pattern>/Chat</url-pattern>
   </servlet-mapping>
+  
   <servlet>
     <servlet-name>AuthJsp</servlet-name>
     <jsp-file>/Auth.jsp</jsp-file>
@@ -25,4 +26,14 @@
     <servlet-name>AuthJsp</servlet-name>
     <url-pattern>/Auth</url-pattern>
   </servlet-mapping>
+  
+    <servlet>
+    <servlet-name>SignUpJsp</servlet-name>
+    <jsp-file>/SignUp.jsp</jsp-file>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>SignUpJsp</servlet-name>
+    <url-pattern>/SignUp</url-pattern>
+  </servlet-mapping>
+  
 </web-app>

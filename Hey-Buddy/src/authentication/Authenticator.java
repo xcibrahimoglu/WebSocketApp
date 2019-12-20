@@ -3,8 +3,6 @@ package authentication;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -12,10 +10,11 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
-import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+
+import service.UserService;
 
 public class Authenticator {
 	
@@ -29,16 +28,9 @@ public class Authenticator {
             .expireAfterAccess(15, TimeUnit.SECONDS) // Entries expire in 15 seconds
             .build();
 
-    private static Map<String, String> users = new HashMap<>();
-    
-    static {
-        users.put("Can", "123");
-        users.put("Gizem", "123");
-        users.put("Basar", "123");
-    }
     
     public static boolean checkCredentials(String username, String password) {
-        return users.containsKey(username) && users.get(username).equals(password);
+        return UserService.CheckUserInDB(username, password);
     }
     
     public static String issueAccessToken(String username) throws IllegalArgumentException, UnsupportedEncodingException {
