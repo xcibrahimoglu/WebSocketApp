@@ -17,7 +17,7 @@ This is a **chat application** that is used via only web browsers.
 
 ## Features
 - Authentication with JWT.
-- P2P communication.
+- One-to-one messaging.
 - Each message and user persist with all required fields in Mongo DB.
 - It supports two type message context: text and image.
 
@@ -68,4 +68,28 @@ If type is "connectedUser":
     "password" : "123"
 }
 ```
+## Authentication Overview
 
+In the first login for a client, as seen below image, if already an account access token is generated and the chat screen appears. 
+
+<p align="center">
+<img border-style="solid" width="600" alt="Ekran Resmi 2020-12-30 22 16 02" src="https://user-images.githubusercontent.com/28542558/71620472-472a2d00-2bdb-11ea-81b5-a67217e48af0.png">
+ </p>
+ <p align="center"> Image 1: Welcome Page</p>
+ 
+If the user is new for Hey Buddy, the user is able to chat friends once signing up.
+
+<p align="center">
+<img  width="600" alt="Ekran Resmi 2020-12-30 22 16 29" src="https://user-images.githubusercontent.com/28542558/71620504-6628bf00-2bdb-11ea-9324-0a5eeedd51f8.png">
+</p>
+<p align="center"> Image 2: Sign Up Page</p>
+
+
+## Conversation Panel
+
+On the left side of the screen online users are displayed. When a message receives from a user, the notification appears in username area under the chats title.
+
+<p align="center">
+<img width="600" alt="Ekran Resmi 2020-12-30 22 36 51" src="https://user-images.githubusercontent.com/28542558/71620516-6f199080-2bdb-11ea-8bb2-bf3af59d0628.png">
+</p>
+<p align="center"> Image 3: Chat Page</p>
