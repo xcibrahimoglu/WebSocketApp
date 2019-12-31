@@ -45,7 +45,7 @@ public class UserRepository {
 		document = collection.find(query).first();
 
 		User user = new User();
-		if(document.isEmpty() == false) {
+		if(document != null) {
 			user.setName(document.getString("name"));
 			user.setLastname(document.getString("lastname"));
 			user.setEmail(document.getString("email"));

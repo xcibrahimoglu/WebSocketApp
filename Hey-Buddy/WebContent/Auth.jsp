@@ -45,7 +45,8 @@
         text-align: center;
         padding: 10px 2.5px 0px 2.5px;
         font-weight: normal;
-        font-size: 14px;
+        font-size: 13px;
+        margin-top: 170px;
         }
 
         /* Authentication */
@@ -59,6 +60,7 @@
             margin-left: auto;
             margin-right: auto;
             margin-bottom: 10px;
+            text-align: center;
         }
         
         #authentication .error {
@@ -70,6 +72,12 @@
             margin-left: auto;
             margin-right: auto;
             margin-bottom: 10px;
+            
+        }
+        #signUp .button {
+            background-color: #FF7E29;
+            border: 2px solid #FF7E29;
+            width: 9em;
         }
 
 
@@ -90,17 +98,21 @@
 </head>
 <body>
 	<div id="title">Hey Buddy!</div>
+	
+	
 
     <form id="authentication" onsubmit="return false;">
+        <a>If you have an account </a>
         <input type="text" name="username" id="username" placeholder="Username" autofocus />
         <input type="password" name="password" id="password" placeholder="Password"/>
         <input type="hidden" name="access-token" id="access-token"/>
         <button class="button" onclick="signIn()">Sign In</button>
-        <h1 class="signUpText">Join Us</h1>
+        
         <span class="error" id="authentication-error"></span>
     </form>
-        
+    
     <form id="signUp" action ="http://localhost:8080/HeyBuddy/SignUp" onclick="signUp()">
+    <a class="signUpText">Create new account</a>
     <button class="button">Sign Up</button>
     </form>
     

@@ -62,7 +62,7 @@ public class UserService extends HttpServlet {
 		User user = database.findDocument(username, password);
 		
 		
-		return user != null ? true : false;
+		return user.getUsername() != null ? true : false;
 		
 	}
 
