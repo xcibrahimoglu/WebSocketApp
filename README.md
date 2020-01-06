@@ -2,12 +2,12 @@
 This is a **chat application** that is used via only web browsers.
 
 ## Components
-### Back-End Side
+### Back-End
     - Java 8
     - Apache Tomcat Server
     - Java WebSocket
     - GSON Library as JSON Parser
-### Front-End Side
+### Front-End
     - JavaScript
     - HTML5
     - HTML5 WebSocket API
@@ -73,7 +73,7 @@ If type is "connectedUser":
 In the first login for a client, as seen below image, if already an account access token is generated and the chat screen appears. 
 
 <p align="center">
-<img border-style="solid" width="600" alt="Ekran Resmi 2020-12-30 22 16 02" src="https://user-images.githubusercontent.com/28542558/71620472-472a2d00-2bdb-11ea-81b5-a67217e48af0.png">
+<img box-shadow="10px 10px" width="600" alt="Ekran Resmi 2020-12-30 22 16 02" src="https://user-images.githubusercontent.com/28542558/71620472-472a2d00-2bdb-11ea-81b5-a67217e48af0.png">
  </p>
  <p align="center"> Image 1: Welcome Page</p>
  
