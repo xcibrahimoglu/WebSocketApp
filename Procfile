@@ -1,1 +1,1 @@
-web: java -ar target/HeyBuddy-0.0.1-SNAPSHOT.war
+web: java -war target/HeyBuddy-0.0.1-SNAPSHOT.war
