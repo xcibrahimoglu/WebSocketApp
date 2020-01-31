@@ -5,7 +5,7 @@
 	<groupId>ChatApplication</groupId>
 	<artifactId>HeyBuddy</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<packaging>war</packaging>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>
@@ -17,24 +17,13 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
-			<plugin> 
-
-                <!-- Building an executable jar -->
-
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.0</version>
-                <configuration>
-                  <archive>
-                    <manifest>
-
-                    <!-- give full qualified name of your main class-->
-                      <mainClass>service.WebSocketService</mainClass>
-
-                    </manifest>
-                  </archive>
-                </configuration>
-    </plugin>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>3.2.1</version>
+				<configuration>
+					<warSourceDirectory>WebContent</warSourceDirectory>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
