@@ -1,1 +1,1 @@
-web: java jar -xvf HeyBuddy-0.0.1-SNAPSHOT.war
+web: java jar HeyBuddy-0.0.1-SNAPSHOT.war
