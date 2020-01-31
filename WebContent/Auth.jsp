@@ -111,7 +111,7 @@
         <span class="error" id="authentication-error"></span>
     </form>
     
-    <form id="signUp" action ="http://localhost:8080/HeyBuddy/SignUp" onclick="signUp()">
+    <form id="signUp" action ="/HeyBuddy/SignUp" onclick="signUp()">
     <a class="signUpText">Create new account</a>
     <button class="button">Sign Up</button>
     </form>
@@ -140,7 +140,7 @@
                         	var accessToken = webSocketAccessToken.token;
                           	document.getElementById("access-token").value = accessToken;
                           	var form = document.getElementById("authentication");
-                          	form.setAttribute("action","http://localhost:8080/HeyBuddy/Chat");
+                          	form.setAttribute("action","/HeyBuddy/Chat");
                           	form.method="post";
                             form.submit();
                             break;
@@ -153,7 +153,7 @@
                     }
                 }
             });
-            request.open("POST", "http://localhost:8080/HeyBuddy/Authentication");
+            request.open("POST", "/HeyBuddy/Authentication");
             request.setRequestHeader("content-type", "application/json");
             request.setRequestHeader("accept", "application/json");
             request.send(JSON.stringify(credentials));
