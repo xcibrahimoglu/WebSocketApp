@@ -1,1 +1,1 @@
-web: java jar -cvf HeyBuddy-0.0.1-SNAPSHOT.war Auth.jsp
+web: java jar -xvf HeyBuddy-0.0.1-SNAPSHOT.war
