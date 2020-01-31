@@ -17,13 +17,24 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
-			<plugin>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>3.2.1</version>
-				<configuration>
-					<SourceDirectory>WebContent</SourceDirectory>
-				</configuration>
-			</plugin>
+			<plugin> 
+
+                <!-- Building an executable jar -->
+
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                  <archive>
+                    <manifest>
+
+                    <!-- give full qualified name of your main class-->
+                      <mainClass>service.WebSocketService</mainClass>
+
+                    </manifest>
+                  </archive>
+                </configuration>
+    </plugin>
 		</plugins>
 	</build>
 
