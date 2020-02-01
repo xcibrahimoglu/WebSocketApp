@@ -108,7 +108,7 @@
                 
                 if(isCreateNewUserOK == true) {
                 	var signUpForm = document.getElementById("SignUp");
-                	signUpForm.setAttribute("action","/HeyBuddy/userService");
+                	signUpForm.setAttribute("action","/userService");
                 	signUpForm.submit();
                 }
             }

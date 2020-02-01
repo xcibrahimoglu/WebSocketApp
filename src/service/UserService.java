@@ -54,7 +54,7 @@ public class UserService extends HttpServlet {
 		database.createDocument(newUser);
 
 		response.setStatus(200);
-		response.sendRedirect("/HeyBuddy/Auth");
+		response.sendRedirect("/Auth");
 	}
 	
 	public static Boolean CheckUserInDB(String username, String password) {

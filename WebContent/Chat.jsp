@@ -332,7 +332,7 @@
 
       currentUser = "<%=request.getParameter("username")%>";
 
-      socket = new WebSocket("ws://" + location.host + "/HeyBuddy/ws?access-token=" + accessToken);
+      socket = new WebSocket("ws://" + location.host + "/ws?access-token=" + accessToken);
 
 
       socket.onopen = function (event) {
@@ -341,7 +341,7 @@
           var title = document.getElementById("title");
           
 		  var buttonForm = document.createElement("form");
-		  buttonForm.setAttribute("action","/HeyBuddy/Auth");
+		  buttonForm.setAttribute("action","/Auth");
 		  buttonForm.method="post";
           var signOut = document.createElement("button");
           signOut.setAttribute("class", "signOut");
