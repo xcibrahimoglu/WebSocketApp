@@ -39,12 +39,11 @@
             border: 2px solid rgb(121, 179, 233);
         }
 
-        .button:hover,
-        .button:focus {
+        /* .button:hover {
             background-color: rgb(121, 179, 233);
             border-color: rgb(121, 179, 233);
             cursor: pointer;
-        }
+        } */
 
         /* Title Bar */
 
@@ -679,7 +678,7 @@
       }
       chat.setAttribute("style","background-image: url(${pageContext.request.contextPath}/sand.jpg)");
 
-      var messages = document.createElement("div");
+      var messages = document.createElement("div"); 
       messages.setAttribute("id", "messages");
 
       chat.append(messages);
