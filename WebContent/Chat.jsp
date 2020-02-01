@@ -677,7 +677,7 @@
               chat.removeChild(chat.firstChild);
           }
       }
-      chat.setAttribute("style","background-image: url(http://raiingkaeng.com/images/flamingo-wallpaper/37816565-flamingo-wallpaper.jpg)");
+      chat.setAttribute("style","background-image: url(${pageContext.request.contextPath}/sand.jpg)");
 
       var messages = document.createElement("div");
       messages.setAttribute("id", "messages");
