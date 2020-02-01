@@ -332,7 +332,10 @@
 
       currentUser = "<%=request.getParameter("username")%>";
 
-      socket = new WebSocket("wss://" + location.host + "/ws?access-token=" + accessToken);
+      if(location.host.includes("localhost"))
+    	  socket = new WebSocket("ws://" + location.host + "/ws?access-token=" + accessToken);
+      else
+          socket = new WebSocket("wss://" + location.host + "/ws?access-token=" + accessToken);
 
 
       socket.onopen = function (event) {

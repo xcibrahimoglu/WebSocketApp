@@ -48,22 +48,23 @@ public class WebSocketService {
 
 	@OnMessage(maxMessageSize = 40024000)
 	public void handleMessage(Session session, @SuppressWarnings("rawtypes") WebSocketMessage webSocketMessage) {
+		synchronized (clients) {
+			if (webSocketMessage.getPayload() instanceof Message) {
 
-		if (webSocketMessage.getPayload() instanceof Message) {
+				Message<?> message = (Message<?>) webSocketMessage.getPayload();
 
-			Message<?> message = (Message<?>) webSocketMessage.getPayload();
+				database.createDocument(message);
 
-			database.createDocument(message);
-
-			for (Session client : clients) {
-				if (client.getUserPrincipal().getName().equalsIgnoreCase(message.getReceiver())
-						|| client.getUserPrincipal().getName().equalsIgnoreCase(message.getSender()))
-					client.getAsyncRemote().sendObject(webSocketMessage);
+				for (Session client : clients) {
+					if (client.getUserPrincipal().getName().equalsIgnoreCase(message.getReceiver())
+							|| client.getUserPrincipal().getName().equalsIgnoreCase(message.getSender()))
+						client.getAsyncRemote().sendObject(webSocketMessage);
+				}
 			}
-		}
-		if (webSocketMessage.getPayload() instanceof ConnectedUser) {
-			for (Session client : clients) {
-				sendUserStatusToAllClients(client.getUserPrincipal().getName(), true);
+			if (webSocketMessage.getPayload() instanceof ConnectedUser) {
+				for (Session client : clients) {
+					sendUserStatusToAllClients(client.getUserPrincipal().getName(), true);
+				}
 			}
 		}
 	}
