@@ -32,10 +32,13 @@ public class WebSocketService {
 		clients.add(session);
 		String[] keys = { "sender", "receiver" };
 		List<Message<?>> messages = database.findDocument(keys, session.getUserPrincipal().getName());
-		for (Message<?> message : messages) {
+
+		messages.forEach(message -> {
 			WebSocketMessage<Message<?>> webSocketMessage = new WebSocketMessage<Message<?>>(message);
+			System.out.println("sender: " + message.getSender() + " receiver: " + message.getReceiver() + " content: "
+					+ message.getContent());
 			session.getAsyncRemote().sendObject(webSocketMessage);
-		}
+		});
 
 	}
 
@@ -55,22 +58,24 @@ public class WebSocketService {
 
 			database.createDocument(message);
 
-			for (Session client : clients) {
+			clients.forEach(client -> {
 				if (client.getUserPrincipal().getName().equalsIgnoreCase(message.getReceiver())
-						|| client.getUserPrincipal().getName().equalsIgnoreCase(message.getSender()))
+						|| client.getUserPrincipal().getName().equalsIgnoreCase(message.getSender())) {
 					client.getAsyncRemote().sendObject(webSocketMessage);
-			}
+				}
+			});
+
 		}
 		if (webSocketMessage.getPayload() instanceof ConnectedUser) {
-			for (Session client : clients) {
-				sendUserStatusToAllClients(client.getUserPrincipal().getName(), true);
-			}
+			clients.forEach(client -> sendUserStatusToAllClients(client.getUserPrincipal().getName(), true));
 		}
 	}
 
 	@OnError
 	public void onError(Throwable t) {
 		System.out.println("onError::" + t.getMessage());
+		t.printStackTrace();
+		System.out.println("onError::" + t.getLocalizedMessage());
 	}
 
 	public void sendUserStatusToAllClients(String user, Boolean status) {
@@ -78,17 +83,16 @@ public class WebSocketService {
 			ConnectedUser connectedUser = new ConnectedUser(user);
 			WebSocketMessage<ConnectedUser> webSocketMessage = new WebSocketMessage<ConnectedUser>(connectedUser);
 
-			for (Session client : clients) {
-				client.getAsyncRemote().sendObject(webSocketMessage);
-			}
+			System.out.println("connected user: " + user);
+			clients.forEach(client -> client.getAsyncRemote().sendObject(webSocketMessage));
+
 		} else if (status == false) { // it means "Offline"
 			DisconnectedUser disconnectedUser = new DisconnectedUser(user);
 			WebSocketMessage<DisconnectedUser> webSocketMessage = new WebSocketMessage<DisconnectedUser>(
 					disconnectedUser);
+			System.out.println("disconnected user: " + user);
+			clients.forEach(client -> client.getAsyncRemote().sendObject(webSocketMessage));
 
-			for (Session client : clients) {
-				client.getAsyncRemote().sendObject(webSocketMessage);
-			}
 		}
 
 	}
