@@ -75,7 +75,6 @@ public class WebSocketService {
 	public void onError(Throwable t) {
 		System.out.println("onError::" + t.getMessage());
 		t.printStackTrace();
-		System.out.println("onError::" + t.getLocalizedMessage());
 	}
 
 	public void sendUserStatusToAllClients(String user, Boolean status) {
