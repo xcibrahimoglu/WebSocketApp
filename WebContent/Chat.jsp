@@ -592,16 +592,15 @@
       
       var contact = document.getElementsByClassName("contact");
       
-      if(contact.hasChildNodes() == false) {
+      if(contact.length == 0) {
     	  var noOnlineUser = document.createElement("span");
-    	  noOnlineUser.setAttribute("class", "name");
+    	  noOnlineUser.setAttribute("id", "noOnlineUser");
     	  noOnlineUser.appendChild(document.createTextNode("No Online User!"));
     	  contacts.appendChild(noOnlineUser);
       }
       else {
-    	  while (contact.hasChildNodes() == true) {
-              chat.removeChild(chat.firstChild);
-          }
+            var noOnlineUser = document.getElementById("noOnlineUser"); 
+            noOnlineUser.removeChild(noOnlineUser.childNodes[0]);
       }
       
   }
