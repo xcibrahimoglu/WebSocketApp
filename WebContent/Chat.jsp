@@ -589,6 +589,21 @@
 
           contacts.appendChild(contact);
       }
+      
+      var contact = document.getElementsByClassName("contact");
+      
+      if(contact.hasChildNodes() == false) {
+    	  var noOnlineUser = document.createElement("span");
+    	  noOnlineUser.setAttribute("class", "name");
+    	  noOnlineUser.appendChild(document.createTextNode("No Online User!"));
+    	  contacts.appendChild(noOnlineUser);
+      }
+      else {
+    	  while (contact.hasChildNodes() == true) {
+              chat.removeChild(chat.firstChild);
+          }
+      }
+      
   }
 
   function removeUserFromContact(username) {
