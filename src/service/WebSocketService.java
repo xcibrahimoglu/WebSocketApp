@@ -35,8 +35,6 @@ public class WebSocketService {
 
 		messages.forEach(message -> {
 			WebSocketMessage<Message<?>> webSocketMessage = new WebSocketMessage<Message<?>>(message);
-			System.out.println("sender: " + message.getSender() + " receiver: " + message.getReceiver() + " content: "
-					+ message.getContent());
 			session.getAsyncRemote().sendObject(webSocketMessage);
 		});
 
