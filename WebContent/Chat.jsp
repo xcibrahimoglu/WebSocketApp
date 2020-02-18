@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
+	pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,312 +8,305 @@
 <title>Hey Buddy!</title>
 
 <style>
-        /* Common */
+/* Common */
+* {
+	margin: 0;
+	padding: 0;
+	font-family: sans-serif;
+	font-size: 13px;
+	outline: 0;
+}
 
-        * {
-            margin: 0;
-            padding: 0;
-            font-family: sans-serif;
-            font-size: 13px;
-            outline: 0;
-        }
+.error {
+	color: #F04823;
+	font-size: 12px;
+}
 
-        .error {
-            color: #F04823;
-            font-size: 12px;
-        }
+input[type="text"], input[type="password"] {
+	border-radius: 20px;
+	padding: 10px;
+	border: 2px solid gainsboro;
+}
 
-        input[type="text"],
-        input[type="password"] {
-            border-radius: 20px;
-            padding: 10px;
-            border: 2px solid gainsboro;
-        }
+.button {
+	border-radius: 20px;
+	padding: 10px;
+	background-color: rgb(121, 179, 233);
+	color: #fff;
+	width: 6em;
+	border: 2px solid rgb(121, 179, 233);
+}
 
-        .button {
-            border-radius: 20px;
-            padding: 10px;
-            background-color: rgb(121, 179, 233);
-            color: #fff;
-            width: 6em;
-            border: 2px solid rgb(121, 179, 233);
-        }
-
-        /* .button:hover {
+/* .button:hover {
             background-color: rgb(121, 179, 233);
             border-color: rgb(121, 179, 233);
             cursor: pointer;
         } */
 
-        /* Title Bar */
+/* Title Bar */
+#title {
+	background-color: rgb(121, 179, 233);
+	font-size: 20px;
+	font-weight: bold;
+	text-align: center;
+	padding: 10px 20px 10px 20px;
+	color: #fff;
+}
 
-        #title {
-            background-color: rgb(121, 179, 233);
-            font-size: 20px;
-            font-weight: bold;
-            text-align: center;
-            padding: 10px 20px 10px 20px;
-            color: #fff;
-        }
+.currentUserToTitle {
+	float: right;
+	font-size: 13px;
+	font-weight: normal;
+	padding: 4px 5px 4px 5px;
+	margin-top: -23px;
+	border-radius: 10px;
+	background-color: rgb(154, 212, 231);
+}
 
-        .currentUserToTitle {
-            float: right;
-            font-size: 13px;
-            font-weight: normal;
-            padding: 4px 5px 4px 5px; 
-            margin-top: -23px;
-            border-radius: 10px;
-            background-color: rgb(154, 212, 231);
-        }
+.signOut {
+	float: right;
+	font-size: 9px;
+	background-color: rgb(214, 86, 69);
+	border-radius: 20px;
+	padding: 5px;
+	margin-left: 5px;
+	margin-top: -23px;
+	color: #fff;
+}
 
-        .signOut {
-            float: right;
-            font-size: 9px;
-            background-color: rgb(214, 86, 69);
-            border-radius: 20px;
-            padding: 5px;
-            margin-left: 5px;
-            margin-top: -23px;
-            color: #fff;
-        }
+.signOut:focus, .signOut:hover {
+	background-color: rgb(121, 179, 233);
+	cursor: pointer;
+}
 
-        .signOut:focus,
-        .signOut:hover {
-            background-color: rgb(121, 179, 233);
-            cursor: pointer;
-        }
+/* Contact list */
+#contacts {
+	float: left;
+	width: 160px;
+	background-color: aliceblue;
+	min-height: calc(100vh - 43px);
+	max-height: calc(100vh - 43px);
+	display: none;
+}
 
-        /* Contact list */
+#contacts .contacts-title {
+	margin-bottom: 10px;
+	padding-top: 15px;
+	height: 40px;
+	font-size: 20px;
+	font-weight: bold;
+	text-align: center;
+	color: #fff;
+	background-color: rgb(154, 212, 231);
+}
 
-        #contacts {
-            float: left;
-            width: 160px;
-            background-color: aliceblue;
-            min-height: calc(100vh - 43px);
-            max-height: calc(100vh - 43px);
-            display: none;
-        }
+#contacts .contact {
+	background-color: rgb(121, 179, 233);
+	text-align: center;
+	width: 140px;
+	border-radius: 10px;
+	margin-left: 10px;
+	margin-bottom: 10px;
+}
 
-        #contacts .contacts-title {
-            margin-bottom: 10px;
-            padding-top: 15px;
-            height: 40px;
-            font-size: 20px;
-            font-weight: bold;
-            text-align: center;
-            color: #fff;
-            background-color: rgb(154, 212, 231);
-        }
+#contacts .contact .unread {
+	background-color: rgb(168, 218, 235);
+	width: 15px;
+	height: 15px;
+	border-radius: 50%;
+	display: inline-block;
+	margin-right: -15px;
+	margin-bottom: 2px;
+}
 
-        #contacts .contact {
-            background-color: rgb(121, 179, 233);
-            text-align: center;
-            width: 140px;
-            border-radius: 10px;
-            margin-left: 10px;
-            margin-bottom: 10px;
-        }
+.contact:focus, .contact:hover {
+	background-color: rgb(168, 218, 235);
+	cursor: pointer;
+}
 
-        #contacts .contact .unread {
-            background-color: rgb(168, 218, 235);
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: -15px;
-            margin-bottom: 2px;
-        }
+#contacts .contact .name {
+	line-height: 40px;
+	vertical-align: super;
+	font-size: 15px;
+	color: #fff;
+	padding: 5px;
+}
 
-        .contact:focus,
-        .contact:hover {
-            background-color: rgb(168, 218, 235);
-            cursor: pointer;
-        }
+/* Chat */
+#chat {
+	float: right;
+	width: calc(100% - 160px);
+	height: calc(100% - 40px);
+	display: none;
+	text-align: center;
+}
 
-        #contacts .contact .name {
-            line-height: 40px;
-            vertical-align: super;
-            font-size: 15px;
-            color: #fff;
-            padding: 5px;
-        }
+#messages {
+	min-height: calc(100vh - 130px);
+	max-height: calc(100vh - 130px);
+	padding: 20px 20px 0 20px;
+	overflow-y: auto;
+}
 
-        /* Chat */
+#messages .message {
+	margin-bottom: 3px;
+}
 
-        #chat {
-            float: right;
-            width: calc(100% - 160px);
-            height: calc(100% - 40px);
-            display: none;
-            text-align: center;
-        }
+#messages .message .content {
+	min-width: 20px;
+	max-width: 250px;
+	border-radius: 20px;
+	padding: 5px 10px 5px 10px;
+	display: table;
+	margin-bottom: 5px;
+}
 
-        #messages {
-            min-height: calc(100vh - 130px);
-            max-height: calc(100vh - 130px);
-            padding: 20px 20px 0 20px;
-            overflow-y: auto;
-        }
+#messages .message #content {
+	min-width: 20px;
+	max-width: 250px;
+	border-radius: 0px;
+	padding: 4px 4px 1px 4px;
+	display: table;
+	margin-bottom: 5px;
+}
 
-        #messages .message {
-            margin-bottom: 3px;
-        }
+#messages .message .time {
+	background-color: aliceblue;
+	color: rgba(10, 134, 143, 0.932);
+	padding-left: 5px;
+	padding-right: 5px;
+	height: 20px;
+	border-radius: 5px;
+	font-size: 10px;
+	opacity: 0.5;
+}
 
-        #messages .message .content {
-            min-width: 20px;
-            max-width: 250px;
-            border-radius: 20px;
-            padding: 5px 10px 5px 10px;
-            display: table;
-            margin-bottom: 5px;
-        }
+#messages .message.received {
+	left: 0;
+	text-align: left;
+}
 
-        #messages .message #content {
-            min-width: 20px;
-            max-width: 250px;
-            border-radius: 0px;
-            padding: 4px 4px 1px 4px;
-            display: table;
-            margin-bottom: 5px;
-        }
+#messages .day .content {
+	background-color: #FF7E29;
+	color: #fff;
+	border-radius: 10px;
+	margin-left: auto;
+	margin-right: auto;
+	font-size: 10px;
+	padding: 3px;
+}
 
-        #messages .message .time {
-            background-color: aliceblue;
-            color: rgba(10, 134, 143, 0.932);
-            padding-left: 5px;
-            padding-right: 5px;
-            height: 20px;
-            border-radius: 5px;
-            font-size: 10px;
-            opacity: 0.5;
-        }
+#messages .message.received .content {
+	background-color: rgb(121, 179, 233);
+	color: aliceblue;
+	border-radius: 0 20px 20px;
+}
 
-        #messages .message.received {
-            left: 0;
-            text-align: left;
-        }
+#messages .message.received #content {
+	background-color: rgb(121, 179, 233);
+	color: aliceblue;
+	border-radius: 0px;
+}
 
-        #messages .day .content {
-            background-color: #FF7E29;
-            color: #fff;
-            border-radius: 10px;
-            margin-left: auto;
-            margin-right: auto;
-            font-size: 10px;
-            padding: 3px;
-        }
+#messages .message.received .sender {
+	color: aliceblue;
+	font-size: 10px;
+}
 
-        #messages .message.received .content {
-            background-color: rgb(121, 179, 233);
-            color: aliceblue;
-            border-radius: 0 20px 20px;
-        }
+#messages .message.sent {
+	right: 0;
+	text-align: right;
+}
 
-        #messages .message.received #content {
-            background-color: rgb(121, 179, 233);
-            color: aliceblue;
-            border-radius: 0px;
-        }
+#messages .message.sent .content {
+	background-color: rgb(121, 179, 233);
+	margin-left: auto;
+	margin-right: 0;
+	color: aliceblue;
+	text-align: right;
+	border-radius: 20px 0 20px 20px;
+}
 
-        #messages .message.received .sender {
-            color: aliceblue;
-            font-size: 10px;
-        }
+#messages .message.sent #content {
+	background-color: rgb(121, 179, 233);
+	margin-left: auto;
+	margin-right: 0;
+	color: aliceblue;
+	text-align: right;
+	border-radius: 0px;
+}
 
-        #messages .message.sent {
-            right: 0;
-            text-align: right;
-        }
+img.imgContent {
+	height: auto;
+	width: auto;
+	max-height: 250px;
+	max-width: 250px;
+}
 
-        #messages .message.sent .content {
-            background-color: rgb(121, 179, 233);
-            margin-left: auto;
-            margin-right: 0;
-            color: aliceblue;
-            text-align: right;
-            border-radius: 20px 0 20px 20px;
-        }
+#chat-controls {
+	height: 40px;
+	padding: 20px 10px 7px 10px;
+}
 
-        #messages .message.sent #content {
-            background-color: rgb(121, 179, 233);
-            margin-left: auto;
-            margin-right: 0;
-            color: aliceblue;
-            text-align: right;
-            border-radius: 0px;
-        }
+#chat-controls button {
+	float: right;
+	min-width: 50px;
+	max-width: 100px;
+	width: calc(8%);
+}
 
-        img.imgContent {
-            height: auto;
-            width: auto;
-            max-height: 250px;
-            max-width: 250px;
-        }
+#chat-controls input[type="text"] {
+	width: calc(90% - 65px);
+	min-width: 200px;
+	max-width: 1100px;
+	padding: 10px 0px 10px 5px;
+}
 
-        #chat-controls {
-            height: 40px;
-            padding: 20px 10px 7px 10px;
-        }
+.inputfile {
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
 
-        #chat-controls button {
-            float: right;
-            min-width: 50px;
-            max-width: 100px;
-            width: calc(8%);
-        }
+.inputfile+label {
+	font-size: 13px;
+	font-weight: 700;
+	float: left;
+	min-width: 25px;
+	max-width: 50px;
+	width: calc(5%);
+	color: white;
+	background-color: rgb(121, 179, 233);
+	cursor: pointer;
+	padding-bottom: 10px;
+	padding-top: 10px;
+	border-radius: 20px;
+}
 
-        #chat-controls input[type="text"] {
-            width:calc(90% - 65px);
-            min-width: 200px;
-            max-width: 1100px;
-            padding: 10px 0px 10px 5px;
-        }
+#messages .message.sent.same-sender-previous-message .sender, #messages .message.received.same-sender-previous-message .sender
+	{
+	display: none;
+}
 
-        .inputfile {
-            width: 0.1px;
-            height: 0.1px;
-            opacity: 0;
-            overflow: hidden;
-            position: absolute;
-            z-index: -1;
-        }
-
-        .inputfile + label {
-            font-size: 13px;
-            font-weight: 700;
-            float: left;
-            min-width: 25px;
-            max-width: 50px;
-            width: calc(5%);
-            color: white;
-            background-color: rgb(121, 179, 233);
-            cursor: pointer;
-            padding-bottom: 10px;
-            padding-top: 10px;
-            border-radius: 20px;
-        }
-
-        #messages .message.sent.same-sender-previous-message .sender,
-        #messages .message.received.same-sender-previous-message .sender {
-            display: none;
-        }
-
-        #messages .message:not(.same-sender-previous-message) {
-            margin-top: 10px;
-        }
-    </style>
+#messages .message:not (.same-sender-previous-message ) {
+	margin-top: 10px;
+}
+</style>
 
 
 </head>
 <body>
 
- <div id="title">Hey Buddy!</div>
+	<div id="title">Hey Buddy!</div>
 
- <div id="contacts"></div>
+	<div id="contacts"></div>
 
- <div id="chat"></div>
+	<div id="chat"></div>
 
-  <script type="text/javascript">
+	<script type="text/javascript">
   var socket;
   var currentUser;
   var contactUser = "";
@@ -338,6 +331,7 @@
 
 
       socket.onopen = function (event) {
+    	  setInterval(ping, 30000);
           document.getElementById("contacts").style.display = "block";
 
           var title = document.getElementById("title");
@@ -369,6 +363,12 @@
 
 
       socket.onmessage = function (event) {
+    	  
+    	  var msg = event.data;
+    	    if (msg == '__pong__') {
+    	        pong();
+    	        return;
+    	    }
 
           if (typeof event.data === "string") {
               var webSocketMessage = JSON.parse(event.data);
@@ -390,6 +390,20 @@
               }
           }
       };
+  }
+  
+  function ping() {
+      ws.send('__ping__');
+      tm = setTimeout(function () {
+
+         /// ---connection closed ///
+
+
+     }, 5000);
+  }
+
+  function pong() {
+     clearTimeout(tm);
   }
   
 
