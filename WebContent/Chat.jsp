@@ -393,7 +393,7 @@ img.imgContent {
   }
   
   function ping() {
-      ws.send('__ping__');
+	  socket.send('__ping__');
       tm = setTimeout(function () {
 
          /// ---connection closed ///
