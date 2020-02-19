@@ -37,6 +37,12 @@ public class WebSocketService {
 		messages.forEach(message -> {
 			WebSocketMessage<Message<?>> webSocketMessage = new WebSocketMessage<Message<?>>(message);
 			session.getAsyncRemote().sendObject(webSocketMessage);
+			try {
+				TimeUnit.SECONDS.sleep(1);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		});
 
 	}
