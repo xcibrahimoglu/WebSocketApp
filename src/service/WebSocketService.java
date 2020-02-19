@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
@@ -75,7 +76,15 @@ public class WebSocketService {
 
 		}
 		if (webSocketMessage.getPayload() instanceof ConnectedUser) {
-			clients.forEach(client -> sendUserStatusToAllClients(client.getUserPrincipal().getName(), true));
+			clients.forEach(client -> {
+				sendUserStatusToAllClients(client.getUserPrincipal().getName(), true); 
+				try {
+					TimeUnit.SECONDS.sleep(1);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			});
 		}
 	}
 
