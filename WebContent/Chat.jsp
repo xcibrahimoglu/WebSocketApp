@@ -363,12 +363,6 @@ img.imgContent {
 
 
       socket.onmessage = function (event) {
-    	  
-    	  var msg = event.data;
-    	    if (msg == '__pong__') {
-    	        pong();
-    	        return;
-    	    }
 
           if (typeof event.data === "string") {
               var webSocketMessage = JSON.parse(event.data);
@@ -387,13 +381,16 @@ img.imgContent {
                   case "disconnectedUser":
                       removeUserFromContact(webSocketMessagePayload.username);
                       break;
+                  case "pingPong":
+                	  pong();
+                      break;
               }
           }
       };
   }
   
   function ping() {
-	  socket.send('__ping__');
+	  socket.send("__ping__");
       tm = setTimeout(function () {
 
          /// ---connection closed ///

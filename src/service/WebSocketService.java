@@ -47,8 +47,18 @@ public class WebSocketService {
 		sendUserStatusToAllClients(session.getUserPrincipal().getName(), false);
 	}
 
+	@SuppressWarnings("unchecked")
 	@OnMessage(maxMessageSize = 40024000)
 	public void handleMessage(Session session, @SuppressWarnings("rawtypes") WebSocketMessage webSocketMessage) {
+		
+		if(webSocketMessage.getPayload() instanceof String) {
+			webSocketMessage.setPayload("__pong__");
+			clients.forEach(client -> {
+				if(client == session) {
+					client.getAsyncRemote().sendObject(webSocketMessage);
+				}
+			});
+		}
 
 		if (webSocketMessage.getPayload() instanceof Message) {
 

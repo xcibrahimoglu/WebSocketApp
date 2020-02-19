@@ -18,8 +18,7 @@ import entity.WebSocketMessage;
 public class MessageDecoder implements Decoder.Text<WebSocketMessage> {
 
 	RuntimeTypeAdapterFactory<WebSocketMessage> runtimeTypeAdapterFactory = RuntimeTypeAdapterFactory
-			.of(WebSocketMessage.class, "type")
-			.registerSubtype(Message.class, "message")
+			.of(WebSocketMessage.class, "type").registerSubtype(Message.class, "message")
 			.registerSubtype(ConnectedUser.class, "connectedUser");
 
 	Gson gson = new GsonBuilder().registerTypeAdapterFactory(runtimeTypeAdapterFactory).create();
@@ -28,9 +27,18 @@ public class MessageDecoder implements Decoder.Text<WebSocketMessage> {
 
 	@Override
 	public WebSocketMessage decode(final String Message) throws DecodeException {
-		@SuppressWarnings("unchecked")
-		WebSocketMessage<?> webSocketMessage = new WebSocketMessage(gson.fromJson(Message, type));
-		return webSocketMessage;
+
+		if (Message.contains("__ping__")) {
+			WebSocketMessage<String> pingPongMessage = new WebSocketMessage<String>();
+			pingPongMessage.setType("pingPong");
+			pingPongMessage.setPayload(Message);
+
+			return pingPongMessage;
+		} else {
+			@SuppressWarnings("unchecked")
+			WebSocketMessage<?> webSocketMessage = new WebSocketMessage(gson.fromJson(Message, type));
+			return webSocketMessage;
+		}
 	}
 
 	@Override
