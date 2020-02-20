@@ -553,7 +553,7 @@ img.imgContent {
 
       });
 
-      messages.scrollTop = messages.scrollHeight;
+      messages.scrollBottom = messages.scrollHeight;
   }
 
   function addConnectedUser(currentUser) {

@@ -49,7 +49,7 @@ public class WebSocketService {
 
 	@OnClose
 	public void onClose(Session session) {
-		System.out.println("onClose::" + session.getId());
+		//System.out.println("onClose::" + session.getId());
 		clients.remove(session);
 		sendUserStatusToAllClients(session.getUserPrincipal().getName(), false);
 	}
