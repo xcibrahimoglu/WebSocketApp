@@ -1,5 +1,7 @@
 package codec;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.lang.reflect.Type;
 
 import javax.websocket.DecodeException;
@@ -9,6 +11,8 @@ import javax.websocket.EndpointConfig;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 
 import entity.ConnectedUser;
 import entity.Message;
@@ -35,10 +39,12 @@ public class MessageDecoder implements Decoder.Text<WebSocketMessage> {
 
 			return pingPongMessage;
 		} else {
-			System.out.println("decode1");
+			
+			JsonReader jsonReader = new JsonReader(new StringReader(Message));
+			jsonReader.setLenient(true);
+			
 			@SuppressWarnings("unchecked")
-			WebSocketMessage<?> webSocketMessage = new WebSocketMessage(gson.fromJson(Message, type));
-			System.out.println("decode2");
+			WebSocketMessage<?> webSocketMessage = new WebSocketMessage(gson.fromJson(jsonReader,type));
 			return webSocketMessage;
 		}
 	}
