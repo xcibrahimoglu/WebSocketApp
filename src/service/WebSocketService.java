@@ -69,14 +69,17 @@ public class WebSocketService {
 
 		if (webSocketMessage.getPayload() instanceof Message) {
 
+			System.out.println("service1");
 			Message<?> message = (Message<?>) webSocketMessage.getPayload();
-
+			System.out.println("service2");
 			database.createDocument(message);
-
+			System.out.println("service3");
 			clients.forEach(client -> {
 				if (client.getUserPrincipal().getName().equalsIgnoreCase(message.getReceiver())
 						|| client.getUserPrincipal().getName().equalsIgnoreCase(message.getSender())) {
+					System.out.println("service4");
 					client.getAsyncRemote().sendObject(webSocketMessage);
+					System.out.println("service5");
 				}
 			});
 

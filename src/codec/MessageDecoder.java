@@ -35,8 +35,10 @@ public class MessageDecoder implements Decoder.Text<WebSocketMessage> {
 
 			return pingPongMessage;
 		} else {
+			System.out.println("decode1");
 			@SuppressWarnings("unchecked")
 			WebSocketMessage<?> webSocketMessage = new WebSocketMessage(gson.fromJson(Message, type));
+			System.out.println("decode2");
 			return webSocketMessage;
 		}
 	}
