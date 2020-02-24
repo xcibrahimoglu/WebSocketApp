@@ -12,7 +12,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
 
 import entity.ConnectedUser;
 import entity.Message;
@@ -39,13 +38,25 @@ public class MessageDecoder implements Decoder.Text<WebSocketMessage> {
 
 			return pingPongMessage;
 		} else {
-			
-			JsonReader jsonReader = new JsonReader(new StringReader(Message));
-			jsonReader.setLenient(true);
-			
-			@SuppressWarnings("unchecked")
-			WebSocketMessage<?> webSocketMessage = new WebSocketMessage(gson.fromJson(jsonReader,type));
-			return webSocketMessage;
+
+			WebSocketMessage<?> wsMessage = null;
+			JsonReader reader = new JsonReader(new StringReader(Message));
+
+			try {
+				reader.beginObject();
+				while (reader.hasNext()) {
+					@SuppressWarnings("unchecked")
+					WebSocketMessage<?> webSocketMessage = new WebSocketMessage(gson.fromJson(reader, type));
+					wsMessage = webSocketMessage;
+				}
+				reader.endObject();
+				reader.close();
+
+			} catch (IOException e) {
+				e.getStackTrace();
+			}
+
+			return wsMessage;
 		}
 	}
 
