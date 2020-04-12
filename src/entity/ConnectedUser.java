@@ -9,6 +9,9 @@ public class ConnectedUser extends WebSocketMessage{
 	public ConnectedUser (String username) {
 		this.setUsername(username);
 	}
+	
+	public ConnectedUser () {
+	}
 
 	public String getUsername() {
 		return username;

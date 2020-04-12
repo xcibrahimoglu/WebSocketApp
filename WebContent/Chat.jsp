@@ -311,6 +311,9 @@ img.imgContent {
   var currentUser;
   var contactUser = "";
   var allMessages = [];
+  var lastMessageDate = "";
+  var lastMessageTime = "";
+  var lastMessageSender = "";
   
   var accessToken = "<%=request.getParameter("access-token")%>";
   openSocket(accessToken);
@@ -371,7 +374,7 @@ img.imgContent {
                   case "message":
                       addMessageToAllMessages(webSocketMessagePayload.sender, webSocketMessagePayload.receiver, webSocketMessagePayload.contentType, webSocketMessagePayload.content, webSocketMessagePayload.receivedDate);
                       if (contactUser != "" && (webSocketMessagePayload.sender == currentUser || webSocketMessagePayload.sender == contactUser))
-                          displayMessage(webSocketMessagePayload.sender, webSocketMessagePayload.receiver, webSocketMessagePayload.contentType, webSocketMessagePayload.receivedDate);
+                          displayMessage(webSocketMessagePayload.sender, webSocketMessagePayload.receiver, webSocketMessagePayload.contentType, webSocketMessagePayload.content, webSocketMessagePayload.receivedDate);
                       else
                           addAlertToContact(webSocketMessagePayload.sender);
                       break;
@@ -459,101 +462,117 @@ img.imgContent {
 
   function addMessageToAllMessages(sender, receiver, contentType, content , deliveryDate) {
 
-	  var sentDate = deliveryDate.split(' ')[0];
-	  var sentTime = deliveryDate.split(' ')[1];
-
       var newMessage = {
           sender: sender,
           receiver: receiver,
           contentType : contentType,
           content: content,
-          receivedDate: sentDate,
-          receivedTime: sentTime
+          receivedDate: deliveryDate
       };
 
       allMessages.push(newMessage);
 
   }
 
-  function displayMessage(peerOne, peerTwo, contentType, receivedDate) {
+  function displayMessage(peerOne, peerTwo, contentType, content, receivedDate) {   
 
-      var lastMessageDate = "";
-      var lastMessageTime = "";
-      var lastMessageSender = "";
-
-      deleteConservationScreen();
-      createConservationScreen();
-
-      messages = document.getElementById("messages");
-
-      allMessages.forEach(function (item) {
-          if ((peerOne == item.sender && peerTwo == item.receiver) || (peerTwo == item.sender && peerOne == item.receiver)) {
-
-              var sentByCurrentUser = currentUser === item.sender;
-
-              if (item.receivedDate != lastMessageDate) {
-                  var day = document.createElement("div");
-                  day.setAttribute("class","day");
-
-                  var dateContent = document.createElement("span");
-                  dateContent.setAttribute("class", "content");
-                  dateContent.appendChild(document.createTextNode(item.receivedDate));
-                  day.appendChild(dateContent);
-
-                  messages.appendChild(day);
+      if(content == undefined) { // Display old messages from DB.
+    	  deleteConversationScreen();
+    	  createConversationScreen(); 
+    	  
+    	  allMessages.forEach(function (item) {
+              if ((peerOne == item.sender && peerTwo == item.receiver) || (peerTwo == item.sender && peerOne == item.receiver)) {
+                  appendMessage(item.sender, item.receiver, item.contentType, item.content, item.receivedDate);
               }
 
-              
-
-              var message = document.createElement("div");
-              message.setAttribute("class", sentByCurrentUser === true ? "message sent" : "message received");
-
-              var messageContent = document.createElement("span");
-              messageContent.setAttribute("class", "content");
-
-              if(item.contentType == "img") {
-                  var imgContent = document.createElement("img");
-                  imgContent.setAttribute("class","imgContent");
-                  messageContent.removeAttribute("class");
-                  messageContent.setAttribute("id", "content");
-
-                  var imgArray = [];
-                  JSON.parse(JSON.stringify(item.content), (key, value) => imgArray.push(value));
-                  var imgUint = new Uint8Array(imgArray);
-
-                  var blob = new Blob([imgUint.buffer], { type: "image/*" });
-                  var urlCreator = window.URL || window.webkitURL;
-                  var imageUrl = urlCreator.createObjectURL(blob);
-                  imgContent.src = imageUrl;
-                  messageContent.appendChild(imgContent);
-              }
-              else if(item.contentType == "txt" ) { 
-                  messageContent.appendChild(document.createTextNode(item.content));
-              }
-
-              message.appendChild(messageContent);
-
-              if (item.receivedTime == lastMessageTime && item.sender == lastMessageSender) {
-                  var time = document.getElementsByClassName("time");
-                  var i = time.length - 1;
-                  time[i].parentElement.removeChild(time[i]);
-              }
-
-              var time = document.createElement("span");
-              time.setAttribute("class", "time");
-              time.appendChild(document.createTextNode(item.receivedTime));
-              message.appendChild(time);
-
-              messages.appendChild(message);
-
-              lastMessageDate = item.receivedDate;
-              lastMessageTime = item.receivedTime;
-              lastMessageSender = item.sender;
+          });
+    	  
+      }    
+      else {
+    	  
+    	  if(messages == null ) {
+              createConversationScreen(); 
           }
+          
+          appendMessage(peerOne, peerTwo, contentType, content, receivedDate);
+    	  
+      }
+      
+      
+  }
+  
+  function appendMessage(peerOne, peerTwo, contentType, content, receivedDate) {
+	  
+	  messages = document.getElementById("messages");
+      
 
-      });
+      var messageDate = receivedDate.split(' ')[0];
+      var messageTime = receivedDate.split(' ')[1];
+      
+      var sentByCurrentUser = currentUser === peerOne;
+
+      var message = document.createElement("div");
+      message.setAttribute("class", sentByCurrentUser === true ? "message sent" : "message received");
+
+      if (messageDate != lastMessageDate) {
+          var day = document.createElement("div");
+          day.setAttribute("class","day");
+
+          var dateContent = document.createElement("span");
+          dateContent.setAttribute("class", "content");
+          dateContent.appendChild(document.createTextNode(messageDate));
+          day.appendChild(dateContent);
+
+          messages.appendChild(day);
+      }
+
+      
+      var messageContent = document.createElement("span");
+      messageContent.setAttribute("class", "content");
+
+      if(contentType == "img") {
+          var imgContent = document.createElement("img");
+          imgContent.setAttribute("class","imgContent");
+          messageContent.removeAttribute("class");
+          messageContent.setAttribute("id", "content");
+
+          var imgArray = [];
+          JSON.parse(JSON.stringify(content), (key, value) => imgArray.push(value));
+          var imgUint = new Uint8Array(imgArray);
+
+          var blob = new Blob([imgUint.buffer], { type: "image/*" });
+          var urlCreator = window.URL || window.webkitURL;
+          var imageUrl = urlCreator.createObjectURL(blob);
+          imgContent.src = imageUrl;
+          messageContent.appendChild(imgContent);
+      }
+      else if(contentType == "txt" ) { 
+          messageContent.appendChild(document.createTextNode(content));
+      }
+
+      message.appendChild(messageContent);
+      
+
+      if (messageTime == lastMessageTime && peerOne == lastMessageSender) {
+          var time = document.getElementsByClassName("time");
+          var i = time.length - 1;
+          time[i].parentElement.removeChild(time[i]);
+      }
+
+      var time = document.createElement("span");
+      time.setAttribute("class", "time");
+      time.appendChild(document.createTextNode(messageTime));
+      message.appendChild(time);
+
+      messages.appendChild(message);
+
+      lastMessageDate = messageDate;
+      lastMessageTime = messageTime;
+      lastMessageSender = peerOne;
+      
 
       messages.scrollTop = messages.scrollHeight;
+      
   }
 
   function addConnectedUser(currentUser) {
@@ -614,7 +633,7 @@ img.imgContent {
       }
 
       if(contactUser == username) {
-          deleteConservationScreen();
+          deleteConversationScreen();
           contactUser = "";
       }
   }
@@ -662,7 +681,11 @@ img.imgContent {
 
   }
 
-  function deleteConservationScreen() {
+  function deleteConversationScreen() {
+	  
+	  lastMessageDate = "";
+	  lastMessageTime = "";
+	  lastMessageSender = "";
 
       var chat = document.getElementById("chat");
 
@@ -674,7 +697,7 @@ img.imgContent {
 
   }
 
-  function createConservationScreen() {
+  function createConversationScreen() {
 
       addBackgroundColorToContact();
 

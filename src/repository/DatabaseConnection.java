@@ -3,6 +3,8 @@ package repository;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
+//import java.util.logging.Level;
+
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 
@@ -24,6 +26,7 @@ public class DatabaseConnection {
 
 		@SuppressWarnings("resource")
 		MongoClient mongoClient = new MongoClient(uri);
+		//java.util.logging.Logger.getLogger("org.mongodb.driver").setLevel(Level.SEVERE);
 		try {
 			database = mongoClient.getDatabase("ChatApp").withCodecRegistry(pojoCodecRegistry);
 		} catch (IllegalArgumentException e) {

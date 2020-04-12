@@ -38,9 +38,8 @@ public class WebSocketService {
 			WebSocketMessage<Message<?>> webSocketMessage = new WebSocketMessage<Message<?>>(message);
 			session.getAsyncRemote().sendObject(webSocketMessage);
 			try {
-				TimeUnit.MILLISECONDS.sleep(10);
+				TimeUnit.MILLISECONDS.sleep(30);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		});
@@ -85,7 +84,7 @@ public class WebSocketService {
 			clients.forEach(client -> {
 				sendUserStatusToAllClients(client.getUserPrincipal().getName(), true); 
 				try {
-					TimeUnit.MILLISECONDS.sleep(10);
+					TimeUnit.MILLISECONDS.sleep(30);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
