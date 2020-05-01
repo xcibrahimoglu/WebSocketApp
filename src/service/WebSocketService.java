@@ -43,6 +43,11 @@ public class WebSocketService {
 				e.printStackTrace();
 			}
 		});
+		
+		WebSocketMessage<String> initialLoadOkMessage = new WebSocketMessage<String>();
+		initialLoadOkMessage.setType("initialLoadOK");
+		
+		session.getAsyncRemote().sendObject(initialLoadOkMessage);
 
 	}
 

@@ -12,10 +12,10 @@ import entity.User;
 
 public class UserRepository {
 
-	MongoCollection<Document> collection = null;
-	MongoDatabase database = DatabaseConnection.getInstance();
+	static MongoDatabase database = DatabaseConnection.getInstance();
+	static MongoCollection<Document> collection = database.getCollection("User");
 
-	public void createDocument(User newUser) {
+	public static void createDocument(User newUser) {
 
 		collection = database.getCollection("User");
 
@@ -30,8 +30,7 @@ public class UserRepository {
 
 	}
 
-	public User findDocument(String username, String password) {
-		collection = database.getCollection("User");
+	public static User findDocument(String username, String password) {
 
 		List<Document> criterias = new ArrayList<Document>();
 
@@ -45,20 +44,32 @@ public class UserRepository {
 		document = collection.find(query).first();
 
 		User user = new User();
-		if(document != null) {
+		if (document != null) {
 			user.setName(document.getString("name"));
 			user.setLastname(document.getString("lastname"));
 			user.setEmail(document.getString("email"));
 			user.setUsername(document.getString("username"));
-			user.setPassword(document.getString("password"));			
+			user.setPassword(document.getString("password"));
 		}
 
 		return user;
 
 	}
 
-	public List<User> findDocuments(String[] keys, String value) {
-		collection = database.getCollection("User");
+	public static List<String> findAllUserNames() {
+
+		List<Document> documents = new ArrayList<Document>();
+		collection.find().into(documents);
+
+		List<String> userNames = new ArrayList<String>();
+
+		documents.forEach(document -> userNames.add(document.getString("username")));
+
+		return userNames;
+
+	}
+
+	public static List<User> findDocuments(String[] keys, String value) {
 
 		List<Document> criterias = new ArrayList<Document>();
 
@@ -73,7 +84,7 @@ public class UserRepository {
 
 		List<User> userList = new ArrayList<User>();
 
-		for (Document document : documents) {
+		documents.forEach(document -> {
 			User user = new User();
 			user.setName(document.getString("name"));
 			user.setLastname(document.getString("lastname"));
@@ -82,7 +93,8 @@ public class UserRepository {
 			user.setPassword(document.getString("password"));
 
 			userList.add(user);
-		}
+
+		});
 
 		return userList;
 
