@@ -409,7 +409,7 @@ img.imgContent {
                       addUserToContact(webSocketMessagePayload.username);
                       break;
                   case "disconnectedUser":
-                      removeUserFromContact(webSocketMessagePayload.username);
+                      //removeUserFromContact(webSocketMessagePayload.username);
                       break;
                   case "initialLoadOK":
                 	  initialLoadOK = true;
