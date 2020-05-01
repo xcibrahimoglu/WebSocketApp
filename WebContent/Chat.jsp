@@ -136,8 +136,9 @@ input[type="text"], input[type="password"] {
 #chat {
     float: right;
     width: calc(100% - 160px);
-    height: calc(100% - 40px);
-    display: none;
+    min-height: calc(100vh - 43px);
+    max-height: calc(100vh - 43px);
+    display: block;
     text-align: center;
 }
 
@@ -304,7 +305,7 @@ img.imgContent {
 
     <div id="contacts"></div>
 
-    <div id="chat"></div>
+    <div id="chat" style="background-image: url(${pageContext.request.contextPath}/sand.jpg)"></div>
 
     <script type="text/javascript">
   var socket;
@@ -412,8 +413,8 @@ img.imgContent {
                       //removeUserFromContact(webSocketMessagePayload.username);
                       break;
                   case "initialLoadOK":
-                	  initialLoadOK = true;
-                	  break;
+                      initialLoadOK = true;
+                      break;
                   case "pingPong":
                       pong();
                       break;
@@ -740,7 +741,7 @@ img.imgContent {
               chat.removeChild(chat.firstChild);
           }
       }
-      chat.setAttribute("style","background-image: url(${pageContext.request.contextPath}/sand.jpg)");
+      //chat.setAttribute("style","background-image: url(${pageContext.request.contextPath}/sand.jpg)");
 
       var messages = document.createElement("div"); 
       messages.setAttribute("id", "messages");
@@ -755,7 +756,7 @@ img.imgContent {
       file.setAttribute("type","file");
       file.setAttribute("id","file");
       file.setAttribute("class","inputfile");
-      file.setAttribute("accept","image/*");
+      //file.setAttribute("accept","image/*");
 
       var label = document.createElement("label");
       label.setAttribute("for","file");
@@ -794,8 +795,8 @@ img.imgContent {
           });
       });
 
-      document.getElementById("chat").style.display = "block";
-      document.getElementById("message").focus();
+      //document.getElementById("chat").style.display = "block";
+      //document.getElementById("message").focus();
       
   }
   
