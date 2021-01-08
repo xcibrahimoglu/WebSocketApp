@@ -1,19 +1,17 @@
 
 package service;
 
-import java.io.IOException;
-import java.util.List;
+import com.google.gson.Gson;
+import entity.User;
+import repository.UserRepository;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import com.google.gson.Gson;
-
-import entity.User;
-import repository.UserRepository;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Servlet implementation class as
@@ -61,12 +59,8 @@ public class UserService extends HttpServlet {
 	}
 	
 	public static Boolean CheckUserInDB(String username, String password) {
-		
 		User user = UserRepository.findDocument(username, password);
-		
-		
-		return user.getUsername() != null ? true : false;
-		
+		return user.getUsername() != null;
 	}
 
 }

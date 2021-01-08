@@ -1,18 +1,12 @@
 package authentication;
 
-import java.io.IOException;
-import java.security.Principal;
-
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.security.Principal;
 
 @WebFilter("/ws/*")
 public class AccessTokenFilter implements Filter{
@@ -48,7 +42,7 @@ public class AccessTokenFilter implements Filter{
 	
 	private static class AuthenticatedRequest extends HttpServletRequestWrapper {
 
-        private String username;
+        private final String username;
 
         public AuthenticatedRequest(HttpServletRequest request, String username) {
             super(request);

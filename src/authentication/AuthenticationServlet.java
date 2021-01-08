@@ -1,13 +1,13 @@
 package authentication;
 
-import java.io.IOException;
+import com.google.gson.Gson;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import com.google.gson.Gson;
+import java.io.IOException;
 
 /**
  * Servlet implementation class authenticationServlet
@@ -45,43 +45,30 @@ public class AuthenticationServlet extends HttpServlet {
         }
 		
 	}
-	
-	
+
 	private static class Credentials {
 
         private String username;
-
         private String password;
-
 
         public String getUsername() {
             return username;
         }
-
-        @SuppressWarnings("unused")
 		public void setUsername(String username) {
             this.username = username;
         }
-
         public String getPassword() {
             return password;
         }
-
-        @SuppressWarnings("unused")
 		public void setPassword(String password) {
             this.password = password;
         }
     }
 
 	private static class AccessToken {
-
-        @SuppressWarnings("unused")
-		private String token;
-
+		private final String token;
         public AccessToken(String token) {
             this.token = token;
         }
-
     }
-
 }

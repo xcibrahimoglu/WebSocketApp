@@ -1,14 +1,12 @@
 package repository;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bson.Document;
-
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-
 import entity.User;
+import org.bson.Document;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserRepository {
 

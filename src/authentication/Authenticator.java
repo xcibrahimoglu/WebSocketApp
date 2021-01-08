@@ -1,11 +1,5 @@
 package authentication;
 
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.security.SecureRandom;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -13,18 +7,23 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-
 import service.UserService;
+
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 public class Authenticator {
 	
-	private static SecureRandom random = new SecureRandom();
+	private static final SecureRandom random = new SecureRandom();
 	
-	private static Cache<String, String> accessTokens = CacheBuilder.newBuilder()
+	private static final Cache<String, String> accessTokens = CacheBuilder.newBuilder()
             .expireAfterAccess(15, TimeUnit.SECONDS) // Entries expire in 15 seconds
             .build();
 	
-	private static Cache<String,Algorithm> algorithms = CacheBuilder.newBuilder()
+	private static final Cache<String,Algorithm> algorithms = CacheBuilder.newBuilder()
             .expireAfterAccess(15, TimeUnit.SECONDS) // Entries expire in 15 seconds
             .build();
 

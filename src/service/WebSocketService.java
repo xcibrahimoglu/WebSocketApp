@@ -1,25 +1,20 @@
 package service;
 
+import codec.MessageDecoder;
+import codec.MessageEncoder;
+import entity.ConnectedUser;
+import entity.DisconnectedUser;
+import entity.Message;
+import entity.WebSocketMessage;
+import repository.MessageRepository;
+
+import javax.websocket.*;
+import javax.websocket.server.ServerEndpoint;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
-import javax.websocket.OnClose;
-import javax.websocket.OnError;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.server.ServerEndpoint;
-
-import codec.MessageDecoder;
-import codec.MessageEncoder;
-import entity.ConnectedUser;
-import repository.MessageRepository;
-import entity.DisconnectedUser;
-import entity.Message;
-import entity.WebSocketMessage;
 
 @ServerEndpoint(value = "/ws", encoders = MessageEncoder.class, decoders = MessageDecoder.class)
 public class WebSocketService {
@@ -105,14 +100,14 @@ public class WebSocketService {
 	}
 
 	public void sendUserStatusToAllClients(String user, Boolean status) {
-		if (status == true) { // it means "Online"
+		if (status) { // it means "Online"
 			ConnectedUser connectedUser = new ConnectedUser(user);
 			WebSocketMessage<ConnectedUser> webSocketMessage = new WebSocketMessage<ConnectedUser>(connectedUser);
 
 			System.out.println("connected user: " + user);
 			clients.forEach(client -> client.getAsyncRemote().sendObject(webSocketMessage));
 
-		} else if (status == false) { // it means "Offline"
+		} else if (!status ) { // it means "Offline"
 			DisconnectedUser disconnectedUser = new DisconnectedUser(user);
 			WebSocketMessage<DisconnectedUser> webSocketMessage = new WebSocketMessage<DisconnectedUser>(
 					disconnectedUser);
