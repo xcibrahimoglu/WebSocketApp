@@ -19,7 +19,7 @@ public class DatabaseConnection {
     private DatabaseConnection() {
 
         MongoClientURI uri = new MongoClientURI(
-                "mongodb+srv://cani:<password>@cluster0.hlfgz.mongodb.net/<dbname>?retryWrites=true&w=majority");
+                "mongodb+srv://cani:190189@cluster0.hlfgz.mongodb.net/<dbname>?retryWrites=true&w=majority");
 
         MongoClient mongoClient = new MongoClient(uri);
         try {
