@@ -1,2 +1,6 @@
 /build/
 /target/
+.idea
+.DS_Store
+.settings
+.project

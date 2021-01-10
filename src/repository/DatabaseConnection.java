@@ -26,6 +26,7 @@ public class DatabaseConnection {
             database = mongoClient.getDatabase("ChatApp").withCodecRegistry(pojoCodecRegistry);
         } catch (IllegalArgumentException e) {
             System.out.println("could not connect to DB");
+            mongoClient.close();
         }
 
     }
