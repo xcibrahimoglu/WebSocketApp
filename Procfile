@@ -1,1 +1,1 @@
-web: java $JAVA_TOOL_OPTIONS -Xmx671m -XX:CICompilerCount=2 -jar target/dependency/webapp-runner.jar --port $PORT target/*.war
+web: java $JAVA_TOOL_OPTIONS -Xmx300m -Xss512k -XX:CICompilerCount=2 -jar target/dependency/webapp-runner.jar --port $PORT target/*.war
